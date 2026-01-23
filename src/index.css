@@ -1,0 +1,7 @@
+
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --animate-spin-slow: spin 3s linear infinite;
+}
