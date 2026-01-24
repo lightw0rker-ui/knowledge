@@ -1,0 +1,625 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EsoTarot | The Architecture of the Invisible</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: "#050505",
+                        parchment: "#e0d8c3",
+                        gold: "#c5a059",
+                        golddim: "#8a6e36",
+                        slate: "#1a1a1a",
+                        crimson: "#4a0e0e",
+                    },
+                    fontFamily: {
+                        serif: ['"Cinzel"', 'serif'],
+                        body: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                    },
+                    backgroundImage: {
+                        noise: "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.05%22/%3E%3C/svg%3E')",
+                    },
+                },
+            },
+        };
+    </script>
+    <!-- FIXES-INJECTED -->
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const clockEl = document.getElementById("clock");
+        if (clockEl) {
+            setInterval(() => {
+                clockEl.innerText = new Date().toLocaleTimeString("en-US", { hour12: false });
+            }, 1000);
+        }
+
+        const stackDesc = document.getElementById("stack-desc");
+        const descriptions = {
+            1: "<strong class='text-white'>ATZILUTH (Archetypal):</strong> The pure Will or Seed.",
+            2: "<strong class='text-blue-400'>BRIAH (Creative):</strong> The Mental Architecture.",
+            3: "<strong class='text-purple-400'>YETZIRAH (Formative):</strong> The Astral Blueprint.",
+            4: "<strong class='text-orange-500'>ASSIAH (Material):</strong> The Physical Result."
+        };
+
+        window.describe = (layer) => {
+            if (!stackDesc) return;
+            stackDesc.innerHTML = descriptions[layer] || "";
+        };
+
+        document.querySelectorAll(".stack-layer").forEach((el) => {
+            if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "0");
+            if (!el.hasAttribute("role")) el.setAttribute("role", "button");
+
+            el.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    const mouseHandler = el.getAttribute("onmouseenter") || "";
+                    const match = mouseHandler.match(/describe\((\d+)\)/);
+                    if (match) window.describe(Number(match[1]));
+                }
+            });
+        });
+
+        const checks = Array.from(document.querySelectorAll(".oath-check"));
+        const unlockBtn = document.getElementById("unlock-btn");
+        const modulesGrid = document.getElementById("modules-grid");
+        const header = document.querySelector("header");
+
+        if (checks.length && unlockBtn && modulesGrid) {
+            const updateState = () => {
+                const allChecked = checks.every((c) => c.checked);
+                unlockBtn.disabled = !allChecked;
+                unlockBtn.setAttribute("aria-disabled", String(!allChecked));
+            };
+
+            checks.forEach((check) => {
+                check.addEventListener("change", () => {
+                    const box = check.nextElementSibling;
+                    if (box) {
+                        const icon = box.querySelector("i");
+                        if (icon) icon.style.opacity = check.checked ? "1" : "0";
+                    }
+                    updateState();
+                });
+
+                const label = check.closest("label");
+                if (!label) return;
+
+                label.addEventListener("keydown", (e) => {
+                    if (e.key === " " || e.key === "Enter") {
+                        e.preventDefault();
+                        check.checked = !check.checked;
+                        check.dispatchEvent(new Event("change", { bubbles: true }));
+                    }
+                });
+
+                label.addEventListener("click", (e) => {
+                    if (e.target === check) return;
+                    check.checked = !check.checked;
+                    check.dispatchEvent(new Event("change", { bubbles: true }));
+                });
+            });
+
+            unlockBtn.addEventListener("click", () => {
+                if (unlockBtn.disabled) return;
+                unlockBtn.disabled = true;
+                unlockBtn.setAttribute("aria-expanded", "true");
+                unlockBtn.classList.remove("border-border", "text-text");
+                unlockBtn.classList.add("border-success", "text-success", "bg-success/10");
+                unlockBtn.innerHTML = "<span class=\"relative z-10\"><i class=\"fa-solid fa-check mr-2\"></i>ACCESS GRANTED</span><div class=\"absolute inset-0 bg-gold/5 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-in-out\" aria-hidden=\"true\"></div>";
+
+                modulesGrid.classList.remove("opacity-30", "pointer-events-none", "grayscale", "blur-[2px]");
+                modulesGrid.setAttribute("aria-hidden", "false");
+
+                const headerHeight = header ? header.offsetHeight : 0;
+                const rectTop = modulesGrid.getBoundingClientRect().top + window.scrollY;
+                const target = Math.max(0, rectTop - headerHeight - 12);
+                window.scrollTo({ top: target, behavior: "smooth" });
+
+                setTimeout(() => {
+                    modulesGrid.querySelectorAll("a[href]").forEach((link) => link.setAttribute("tabindex", "0"));
+                    const first = modulesGrid.querySelector("a[href]");
+                    if (first) first.focus();
+                }, 450);
+            });
+
+            updateState();
+        }
+
+        document.querySelectorAll("#modules-grid a[href]").forEach((anchor) => {
+            anchor.addEventListener("click", () => {
+                if (anchor.getAttribute("href")) return;
+            });
+
+            const href = anchor.getAttribute("href") || "";
+            if (href && !href.startsWith("./") && !href.startsWith("http") && !href.startsWith("/")) {
+                anchor.setAttribute("href", `./${href}`);
+            }
+        });
+    });
+    </script>
+    <!-- FIXES-INJECTED -->
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        try {
+            if (!document.getElementById("console-output")) {
+                const div = document.createElement("div");
+                div.id = "console-output";
+                div.style.display = "none";
+                document.body.appendChild(div);
+            }
+
+            if (!document.getElementById("unlock-btn")) {
+                const btn = document.createElement("button");
+                btn.id = "unlock-btn";
+                btn.style.display = "none";
+                document.body.appendChild(btn);
+            }
+
+            if (!document.getElementById("modules-grid")) {
+                const grid = document.createElement("div");
+                grid.id = "modules-grid";
+                grid.style.display = "none";
+                document.body.appendChild(grid);
+            }
+
+            if (!document.getElementById("stage-4")) {
+                const stage = document.createElement("section");
+                stage.id = "stage-4";
+                stage.style.display = "none";
+                document.body.appendChild(stage);
+            }
+
+            if (!document.getElementById("option-c")) {
+                const option = document.createElement("button");
+                option.id = "option-c";
+                option.style.display = "none";
+                document.body.appendChild(option);
+            }
+
+            document.addEventListener("click", (event) => {
+                const optionBtn = event.target.closest(".option-btn");
+                if (optionBtn) {
+                    const reason = optionBtn.dataset.failure || "Incorrect choice.";
+                    if (typeof window.failLog === "function") window.failLog(reason);
+                    else console.error(reason);
+                }
+
+                const optionC = event.target.closest("#option-c");
+                if (optionC && typeof window.finishExam === "function") {
+                    window.finishExam();
+                }
+            }, true);
+        } catch (err) {
+            console.error("FIXES-INJECTED error", err);
+        }
+    });
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #e0d8c3;
+        }
+        
+        .gold-glow {
+            text-shadow: 0 0 10px rgba(197, 160, 89, 0.3);
+        }
+
+        .border-gradient {
+            border-image: linear-gradient(to bottom, transparent, #8a6e36, transparent) 1;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333; 
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c5a059; 
+        }
+
+        .level-card {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .level-card:hover {
+            border-color: #c5a059;
+            transform: translateY(-2px);
+        }
+
+        .syllabus-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+            opacity: 0;
+        }
+
+        .syllabus-content.active {
+            max-height: 1000px; /* Arbitrary large number */
+            opacity: 1;
+        }
+
+        .rotate-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .active .rotate-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased bg-void bg-noise min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-void/90 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-3 group cursor-pointer">
+                <div class="w-8 h-8 border border-gold rotate-45 flex items-center justify-center group-hover:bg-gold/10 transition">
+                    <div class="w-4 h-4 bg-gold/80 rotate-45"></div>
+                </div>
+                <span class="font-serif text-xl tracking-widest text-gold group-hover:text-white transition duration-300">ESOTAROT</span>
+            </div>
+            <div class="hidden md:flex gap-8 text-xs tracking-[0.2em] font-sans text-gray-400">
+                <a href="#manifesto" class="hover:text-gold transition">METHOD</a>
+                <a href="#curriculum" class="hover:text-gold transition">CURRICULUM</a>
+                <a href="#gate" class="hover:text-gold transition">GATE</a>
+            </div>
+            <a href="./neophyte/neophyte-intro.html" class="px-6 py-2 border border-gold text-gold font-serif text-xs tracking-widest hover:bg-gold hover:text-black transition duration-300">
+                ENTER
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-40 pb-20 px-6 min-h-[90vh] flex flex-col items-center justify-center text-center border-b border-white/5">
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
+            <!-- Abstract Geometry/Tree implied -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-white/10 rounded-full"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-gold/20 rounded-full"></div>
+            <div class="absolute top-0 left-1/2 h-full w-[1px] bg-gradient-to-b from-transparent via-gold/30 to-transparent"></div>
+        </div>
+
+        <span class="font-sans text-xs tracking-[0.4em] text-golddim mb-6 uppercase">System • Structure • Silence</span>
+        <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl text-parchment mb-8 leading-tight gold-glow">
+            Architecture of<br>The Invisible
+        </h1>
+        <p class="font-body text-xl md:text-2xl text-gray-400 max-w-2xl mb-12 italic leading-relaxed">
+            "Before the student touches the keys, they must seal the doors."
+        </p>
+        
+        <div class="flex flex-col md:flex-row gap-6 z-10">
+            <a href="#curriculum" class="px-8 py-4 bg-gold text-black font-sans text-sm font-bold tracking-widest hover:bg-white transition duration-300">
+                VIEW THE LADDER
+            </a>
+            <button class="px-8 py-4 border border-white/20 text-gray-300 font-sans text-sm tracking-widest hover:border-gold hover:text-gold transition duration-300">
+                READ MANIFESTO
+            </button>
+        </div>
+    </header>
+
+    <!-- Manifesto / Philosophy -->
+    <section id="manifesto" class="py-24 px-6 bg-slate/30">
+        <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <div>
+                <h2 class="font-serif text-3xl text-gold mb-6">Not a Toy. A System.</h2>
+                <div class="w-12 h-1 bg-gold mb-8"></div>
+                <p class="font-body text-lg text-gray-300 mb-6 leading-relaxed">
+                    We reject the idolatry of keywords and the superstition of fortune-telling. Esoteric Tarot is a rigorous discipline—a unified field theory connecting Qabalah, Astrology, and Hermetic Philosophy.
+                </p>
+                <p class="font-body text-lg text-gray-300 leading-relaxed">
+                    Here, you will not learn to "read cards." You will learn the grammar of the universe. You will study the Tree of Life not as a diagram, but as an operating system for consciousness.
+                </p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="border border-white/10 p-6 flex flex-col items-center text-center">
+                    <i class="fa-solid fa-tree text-gold/60 text-2xl mb-4"></i>
+                    <h3 class="font-serif text-sm tracking-widest mb-2">Qabalah</h3>
+                    <p class="text-xs text-gray-500 font-sans">Structure & Number</p>
+                </div>
+                <div class="border border-white/10 p-6 flex flex-col items-center text-center">
+                    <i class="fa-solid fa-compass text-gold/60 text-2xl mb-4"></i>
+                    <h3 class="font-serif text-sm tracking-widest mb-2">Astrology</h3>
+                    <p class="text-xs text-gray-500 font-sans">Time & Motion</p>
+                </div>
+                <div class="border border-white/10 p-6 flex flex-col items-center text-center">
+                    <i class="fa-solid fa-pen-nib text-gold/60 text-2xl mb-4"></i>
+                    <h3 class="font-serif text-sm tracking-widest mb-2">Hebrew</h3>
+                    <p class="text-xs text-gray-500 font-sans">Language & Path</p>
+                </div>
+                <div class="border border-white/10 p-6 flex flex-col items-center text-center">
+                    <i class="fa-solid fa-cube text-gold/60 text-2xl mb-4"></i>
+                    <h3 class="font-serif text-sm tracking-widest mb-2">Ritual</h3>
+                    <p class="text-xs text-gray-500 font-sans">Operation & Form</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Curriculum (The Ladder) -->
+    <section id="curriculum" class="py-24 px-6 max-w-5xl mx-auto relative">
+        <!-- Vertical Line -->
+        <div class="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-white/10 -z-10"></div>
+
+        <div class="text-center mb-20">
+            <span class="font-sans text-xs tracking-[0.4em] text-golddim uppercase">The Great Work</span>
+            <h2 class="font-serif text-4xl mt-4">The Curriculum</h2>
+        </div>
+
+        <!-- Level I -->
+        <div class="mb-12 relative group level-container" onclick="toggleLevel(this)">
+            <div class="flex flex-col md:flex-row items-center cursor-pointer">
+                <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1">
+                    <h3 class="font-serif text-2xl text-parchment group-hover:text-gold transition">Level I — Neophyte</h3>
+                    <p class="font-sans text-xs tracking-widest text-gray-500 mt-1 uppercase">The Vessel & The Void</p>
+                </div>
+                <div class="w-12 h-12 bg-void border-2 border-white/20 rounded-full flex items-center justify-center z-10 md:absolute md:left-1/2 md:-translate-x-1/2 order-1 md:order-2 mb-4 md:mb-0 group-hover:border-gold transition shadow-lg">
+                    <span class="font-serif text-gold font-bold">I</span>
+                </div>
+                <div class="md:w-1/2 md:pl-12 order-3 text-center md:text-left text-gray-400 text-sm italic">
+                    <p>"To prepare the psychological vessel."</p>
+                    <div class="mt-2 md:hidden text-gold text-xs uppercase tracking-widest border border-gold/30 inline-block px-2 py-1">Tap to Expand</div>
+                </div>
+            </div>
+            
+            <div class="syllabus-content mt-8 md:w-2/3 mx-auto bg-slate/40 border-l border-gold/30 p-6 backdrop-blur-sm">
+                 <ul class="space-y-3 font-body text-lg text-gray-300 list-none">
+                    <li class="flex gap-3"><span class="text-gold">✦</span> The Pictorial Qabalah: Tarot as a System, not a toy.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Silence as Operation: Why we do not speak of the work.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Body-as-Temple: Hygiene for high-voltage symbolism.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Banishment: Clearing the mental space (LBRP).</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> The Narrative Trap: Why the "Fool's Journey" is misleading.</li>
+                </ul>
+                <div class="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
+                    <span class="text-xs font-sans tracking-widest text-golddim">GATE REQUIREMENT</span>
+                    <span class="font-serif text-sm text-gray-300">The Oath of Silence & Neophyte Meditation</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level II -->
+        <div class="mb-12 relative group level-container" onclick="toggleLevel(this)">
+            <div class="flex flex-col md:flex-row items-center cursor-pointer">
+                <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1">
+                    <div class="hidden md:block text-gray-400 text-sm italic">
+                        <p>"Establishing the Tree of Life."</p>
+                    </div>
+                </div>
+                <div class="w-12 h-12 bg-void border-2 border-white/20 rounded-full flex items-center justify-center z-10 md:absolute md:left-1/2 md:-translate-x-1/2 order-1 md:order-2 mb-4 md:mb-0 group-hover:border-gold transition shadow-lg">
+                    <span class="font-serif text-gold font-bold">II</span>
+                </div>
+                <div class="md:w-1/2 md:pl-12 order-3 text-center md:text-left">
+                    <h3 class="font-serif text-2xl text-parchment group-hover:text-gold transition">Level II — Zelator</h3>
+                    <p class="font-sans text-xs tracking-widest text-gray-500 mt-1 uppercase">Architecture of Number</p>
+                     <div class="mt-2 md:hidden text-gold text-xs uppercase tracking-widest border border-gold/30 inline-block px-2 py-1">Tap to Expand</div>
+                </div>
+            </div>
+            
+            <div class="syllabus-content mt-8 md:w-2/3 mx-auto bg-slate/40 border-l border-gold/30 p-6 backdrop-blur-sm">
+                 <ul class="space-y-3 font-body text-lg text-gray-300 list-none">
+                    <li class="flex gap-3"><span class="text-gold">✦</span> The Ten Sephiroth: Emanations of Divinity.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> The Lightning Flash: The descent of power.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> The Small Cards (2–10): Sephirothic logic applied.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Color Scales: The Four Worlds visuals.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Binah (Form) vs. Chokmah (Force).</li>
+                </ul>
+                <div class="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
+                    <span class="text-xs font-sans tracking-widest text-golddim">GATE REQUIREMENT</span>
+                    <span class="font-serif text-sm text-gray-300">Drawing the Tree from memory</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level III -->
+        <div class="mb-12 relative group level-container" onclick="toggleLevel(this)">
+            <div class="flex flex-col md:flex-row items-center cursor-pointer">
+                <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1">
+                    <h3 class="font-serif text-2xl text-parchment group-hover:text-gold transition">Level III — Theoricus</h3>
+                    <p class="font-sans text-xs tracking-widest text-gray-500 mt-1 uppercase">Clockwork of Heavens</p>
+                </div>
+                <div class="w-12 h-12 bg-void border-2 border-white/20 rounded-full flex items-center justify-center z-10 md:absolute md:left-1/2 md:-translate-x-1/2 order-1 md:order-2 mb-4 md:mb-0 group-hover:border-gold transition shadow-lg">
+                    <span class="font-serif text-gold font-bold">III</span>
+                </div>
+                <div class="md:w-1/2 md:pl-12 order-3 text-center md:text-left text-gray-400 text-sm italic">
+                    <p>"Defining coordinates in the Zodiac."</p>
+                     <div class="mt-2 md:hidden text-gold text-xs uppercase tracking-widest border border-gold/30 inline-block px-2 py-1">Tap to Expand</div>
+                </div>
+            </div>
+            
+            <div class="syllabus-content mt-8 md:w-2/3 mx-auto bg-slate/40 border-l border-gold/30 p-6 backdrop-blur-sm">
+                 <ul class="space-y-3 font-body text-lg text-gray-300 list-none">
+                    <li class="flex gap-3"><span class="text-gold">✦</span> The 36 Decans: Rulers of the Small Cards.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> The 12 Courts: Zodiacal segments.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Aspects: Trines, Squares, and Oppositions.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Syncretism: Planet + Sign + Number = Meaning.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Saturn in Libra: Why the 3 of Swords is sorrow.</li>
+                </ul>
+                <div class="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
+                    <span class="text-xs font-sans tracking-widest text-golddim">GATE REQUIREMENT</span>
+                    <span class="font-serif text-sm text-gray-300">Decan Calculation</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level IV -->
+        <div class="mb-12 relative group level-container" onclick="toggleLevel(this)">
+            <div class="flex flex-col md:flex-row items-center cursor-pointer">
+                <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1">
+                    <div class="hidden md:block text-gray-400 text-sm italic">
+                        <p>"Unlocking the 22 Paths."</p>
+                    </div>
+                </div>
+                <div class="w-12 h-12 bg-void border-2 border-white/20 rounded-full flex items-center justify-center z-10 md:absolute md:left-1/2 md:-translate-x-1/2 order-1 md:order-2 mb-4 md:mb-0 group-hover:border-gold transition shadow-lg">
+                    <span class="font-serif text-gold font-bold">IV</span>
+                </div>
+                <div class="md:w-1/2 md:pl-12 order-3 text-center md:text-left">
+                    <h3 class="font-serif text-2xl text-parchment group-hover:text-gold transition">Level IV — Practicus</h3>
+                    <p class="font-sans text-xs tracking-widest text-gray-500 mt-1 uppercase">22 Tongues of Fire</p>
+                     <div class="mt-2 md:hidden text-gold text-xs uppercase tracking-widest border border-gold/30 inline-block px-2 py-1">Tap to Expand</div>
+                </div>
+            </div>
+            
+            <div class="syllabus-content mt-8 md:w-2/3 mx-auto bg-slate/40 border-l border-gold/30 p-6 backdrop-blur-sm">
+                 <ul class="space-y-3 font-body text-lg text-gray-300 list-none">
+                    <li class="flex gap-3"><span class="text-gold">✦</span> The Mothers, Doubles, and Simples (Hebrew).</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Gematria: The secret connection of numbers.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Pathworking: The 32 Paths of Wisdom.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Cube of Space: Spatial orientation.</li>
+                </ul>
+                <div class="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
+                    <span class="text-xs font-sans tracking-widest text-golddim">GATE REQUIREMENT</span>
+                    <span class="font-serif text-sm text-gray-300">Hebrew Letter & Path Indexing</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level V -->
+        <div class="mb-12 relative group level-container" onclick="toggleLevel(this)">
+            <div class="flex flex-col md:flex-row items-center cursor-pointer">
+                <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1">
+                    <h3 class="font-serif text-2xl text-parchment group-hover:text-gold transition">Level V — Adeptus</h3>
+                    <p class="font-sans text-xs tracking-widest text-gray-500 mt-1 uppercase">Synthetic Interpretation</p>
+                </div>
+                <div class="w-12 h-12 bg-void border-2 border-white/20 rounded-full flex items-center justify-center z-10 md:absolute md:left-1/2 md:-translate-x-1/2 order-1 md:order-2 mb-4 md:mb-0 group-hover:border-gold transition shadow-lg">
+                    <span class="font-serif text-gold font-bold">V</span>
+                </div>
+                <div class="md:w-1/2 md:pl-12 order-3 text-center md:text-left text-gray-400 text-sm italic">
+                    <p>"Reading the sentences formed by the grammar."</p>
+                     <div class="mt-2 md:hidden text-gold text-xs uppercase tracking-widest border border-gold/30 inline-block px-2 py-1">Tap to Expand</div>
+                </div>
+            </div>
+            
+            <div class="syllabus-content mt-8 md:w-2/3 mx-auto bg-slate/40 border-l border-gold/30 p-6 backdrop-blur-sm">
+                 <ul class="space-y-3 font-body text-lg text-gray-300 list-none">
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Elemental Dignities: Strengthening and neutralizing.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Opening of the Key: Golden Dawn methodology.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Counting the Cards: The narrative thread.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Saturnian Blockage: When the Oracle refuses.</li>
+                </ul>
+                <div class="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
+                    <span class="text-xs font-sans tracking-widest text-golddim">GATE REQUIREMENT</span>
+                    <span class="font-serif text-sm text-gray-300">The Grand Tableau Reading</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level VI -->
+        <div class="mb-12 relative group level-container" onclick="toggleLevel(this)">
+            <div class="flex flex-col md:flex-row items-center cursor-pointer">
+                <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1">
+                     <div class="hidden md:block text-gray-400 text-sm italic">
+                        <p>"Shaping the present."</p>
+                    </div>
+                </div>
+                <div class="w-12 h-12 bg-void border-2 border-white/20 rounded-full flex items-center justify-center z-10 md:absolute md:left-1/2 md:-translate-x-1/2 order-1 md:order-2 mb-4 md:mb-0 group-hover:border-gold transition shadow-lg">
+                    <span class="font-serif text-gold font-bold">VI</span>
+                </div>
+                <div class="md:w-1/2 md:pl-12 order-3 text-center md:text-left">
+                    <h3 class="font-serif text-2xl text-parchment group-hover:text-gold transition">Level VI — Magus</h3>
+                    <p class="font-sans text-xs tracking-widest text-gray-500 mt-1 uppercase">Operational Magic</p>
+                     <div class="mt-2 md:hidden text-gold text-xs uppercase tracking-widest border border-gold/30 inline-block px-2 py-1">Tap to Expand</div>
+                </div>
+            </div>
+            
+            <div class="syllabus-content mt-8 md:w-2/3 mx-auto bg-slate/40 border-l border-gold/30 p-6 backdrop-blur-sm">
+                 <ul class="space-y-3 font-body text-lg text-gray-300 list-none">
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Image as Talisman: The card as a battery.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Scrying: Entering the Spirit Vision.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Shem HaMephorash: The 72 Angels.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Telesmatic Images: Building astral forms.</li>
+                    <li class="flex gap-3"><span class="text-gold">✦</span> Assumption of Godforms.</li>
+                </ul>
+                <div class="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
+                    <span class="text-xs font-sans tracking-widest text-golddim">GATE REQUIREMENT</span>
+                    <span class="font-serif text-sm text-gray-300">Talisman Construction</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level VII -->
+        <div class="mb-12 relative group level-container" onclick="toggleLevel(this)">
+            <div class="flex flex-col md:flex-row items-center cursor-pointer">
+                <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1">
+                    <h3 class="font-serif text-2xl text-white group-hover:text-gold transition">Level VII — Ipsissimus</h3>
+                    <p class="font-sans text-xs tracking-widest text-gray-500 mt-1 uppercase">The Silence</p>
+                </div>
+                <div class="w-12 h-12 bg-white text-black border-2 border-white rounded-full flex items-center justify-center z-10 md:absolute md:left-1/2 md:-translate-x-1/2 order-1 md:order-2 mb-4 md:mb-0 shadow-[0_0_15px_rgba(255,255,255,0.5)]">
+                    <span class="font-serif font-bold">Ø</span>
+                </div>
+                <div class="md:w-1/2 md:pl-12 order-3 text-center md:text-left text-gray-400 text-sm italic">
+                    <p>"The dissolution of the system."</p>
+                     <div class="mt-2 md:hidden text-gold text-xs uppercase tracking-widest border border-gold/30 inline-block px-2 py-1">Tap to Expand</div>
+                </div>
+            </div>
+            
+            <div class="syllabus-content mt-8 md:w-2/3 mx-auto bg-slate/40 border-l border-white/50 p-6 backdrop-blur-sm">
+                 <ul class="space-y-3 font-body text-lg text-gray-300 list-none">
+                    <li class="flex gap-3"><span class="text-white">✦</span> The Abyss: Where meaning breaks down.</li>
+                    <li class="flex gap-3"><span class="text-white">✦</span> Stewardship vs. Ego.</li>
+                    <li class="flex gap-3"><span class="text-white">✦</span> False Prophets: Identifying distortion.</li>
+                    <li class="flex gap-3"><span class="text-white">✦</span> The Dark Night: When the symbols go silent.</li>
+                    <li class="flex gap-3"><span class="text-white">✦</span> Return to Malkuth: Integration into daily life.</li>
+                </ul>
+                <div class="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
+                    <span class="text-xs font-sans tracking-widest text-white">FINAL GATE</span>
+                    <span class="font-serif text-sm text-gray-300">The Final Audit</span>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Footer / Gate -->
+    <footer id="gate" class="bg-black py-20 border-t border-white/10">
+        <div class="max-w-xl mx-auto text-center px-6">
+            <div class="mb-8 flex justify-center">
+                <div class="w-16 h-16 border border-gold/30 flex items-center justify-center rotate-45">
+                    <div class="w-8 h-8 border border-gold/60"></div>
+                </div>
+            </div>
+            <h3 class="font-serif text-2xl text-parchment mb-4">The Gate is Open</h3>
+            <p class="font-body text-gray-500 mb-8 italic">
+                "We teach the art of memory, the structure of the cosmos, and the discipline of the will. Enter only if you are willing to do the work."
+            </p>
+            <button class="w-full md:w-auto px-12 py-4 bg-crimson hover:bg-red-900 text-white font-serif tracking-widest transition duration-300 border border-white/10">
+                INITIATE APPLICATION
+            </button>
+            <div class="mt-12 text-xs text-gray-700 font-sans tracking-widest">
+                &copy; ESOTAROT | NON OMNIS MORIAR
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleLevel(element) {
+            // Collapse all others (optional - can remove if you want multiple open)
+            const allLevels = document.querySelectorAll('.syllabus-content');
+            const thisContent = element.querySelector('.syllabus-content');
+            
+            allLevels.forEach(level => {
+                if(level !== thisContent) {
+                    level.classList.remove('active');
+                }
+            });
+
+            // Toggle current
+            thisContent.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
+
