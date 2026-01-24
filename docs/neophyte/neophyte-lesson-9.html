@@ -1,0 +1,423 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EsoTarot | Lesson IX: The Narrative Trap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#050505',
+                        paper: '#e0d8c3',
+                        gold: '#c5a059',
+                        golddim: '#8a6e36',
+                        chronos: '#4b5563', // Linear Time (Grey)
+                        kairos: '#c5a059',  // Divine Time (Gold)
+                        circuit: '#00ff41', // Active Energy
+                    },
+                    fontFamily: {
+                        serif: ['"Cinzel"', 'serif'],
+                        body: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'noise': "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.07%22/%3E%3C/svg%3E')",
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Base */
+        html, body {
+            box-sizing: border-box;
+            background-color: #050505;
+            color: #e0d8c3;
+            height: 100%;
+        }
+        *, *:before, *:after { box-sizing: inherit; }
+
+        /* Sidebar State */
+        .sidebar-link {
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+            opacity: 0.7;
+        }
+        .sidebar-link:hover {
+            opacity: 1;
+            padding-left: 1.75rem;
+            color: #c5a059;
+            border-left-color: #c5a059;
+        }
+        .sidebar-link.active {
+            opacity: 1;
+            color: #e0d8c3;
+            border-left-color: #c5a059;
+            background: linear-gradient(90deg, rgba(197, 160, 89, 0.1) 0%, transparent 100%);
+        }
+
+        /* Reality Tuner (Canvas) */
+        .archetype-node {
+            position: absolute;
+            width: 40px; height: 40px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            transition: all 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 20;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .archetype-node.active {
+            border-color: #c5a059;
+            background: #0f0f0f;
+            box-shadow: 0 0 20px rgba(197, 160, 89, 0.4);
+            color: #c5a059;
+        }
+
+        /* Connecting Lines */
+        .circuit-lines {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1s ease;
+            z-index: 10;
+        }
+        
+        .mode-struct .circuit-lines { opacity: 1; }
+
+        /* Pulses */
+        .energy-pulse {
+            fill: #c5a059;
+            filter: drop-shadow(0 0 5px #c5a059);
+            opacity: 0;
+        }
+        
+        .mode-struct .energy-pulse {
+            animation: flowPulse 2s infinite linear;
+            opacity: 1;
+        }
+
+        @keyframes flowPulse {
+            0% { offset-distance: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { offset-distance: 100%; opacity: 0; }
+        }
+
+        /* Positions: Linear Mode */
+        .mode-linear .node-0 { top: 50%; left: 10%; transform: translate(-50%, -50%); }
+        .mode-linear .node-1 { top: 50%; left: 26%; transform: translate(-50%, -50%); }
+        .mode-linear .node-2 { top: 50%; left: 42%; transform: translate(-50%, -50%); }
+        .mode-linear .node-3 { top: 50%; left: 58%; transform: translate(-50%, -50%); }
+        .mode-linear .node-4 { top: 50%; left: 74%; transform: translate(-50%, -50%); }
+        .mode-linear .node-5 { top: 50%; left: 90%; transform: translate(-50%, -50%); }
+
+        /* Positions: Structural Mode (Tree of Life) */
+        .mode-struct .node-0 { top: 15%; left: 50%; transform: translate(-50%, -50%); border-color: #E4D00A; color: #E4D00A; } 
+        .mode-struct .node-1 { top: 25%; left: 75%; transform: translate(-50%, -50%); } 
+        .mode-struct .node-2 { top: 40%; left: 50%; transform: translate(-50%, -50%); }
+        .mode-struct .node-3 { top: 25%; left: 25%; transform: translate(-50%, -50%); }
+        .mode-struct .node-4 { top: 55%; left: 75%; transform: translate(-50%, -50%); }
+        .mode-struct .node-5 { top: 55%; left: 25%; transform: translate(-50%, -50%); }
+    </style>
+</head>
+<body class="bg-void bg-noise min-h-screen flex overflow-x-hidden">
+
+    <aside id="sidebar" class="w-64 border-r border-white/10 flex-col z-50 bg-void/95 backdrop-blur-xl h-full md:h-screen md:flex
+                   fixed left-0 top-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+        <div class="p-8 border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-6 h-6 border border-gold rotate-45 flex items-center justify-center">
+                    <div class="w-3 h-3 bg-gold/80 rotate-45"></div>
+                </div>
+                <span class="font-serif text-lg tracking-widest text-gold">ESOTAROT</span>
+            </div>
+            <div class="mt-6 text-[10px] font-sans text-gray-500 uppercase tracking-widest flex justify-between">
+                <span>Current Station</span>
+                <span class="text-gold">Malkuth</span>
+            </div>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-8">
+            <div class="px-6 mb-4 text-xs font-sans text-golddim uppercase tracking-widest">Neophyte Curriculum</div>
+            
+            <a href="neophyte-lesson-6.html" class="sidebar-link block px-6 py-3 font-sans text-sm tracking-wide text-gray-400">
+                6. Idolatry of Keywords
+            </a>
+            <a href="neophyte-lesson-7.html" class="sidebar-link block px-6 py-3 font-sans text-sm tracking-wide text-gray-400">
+                7. Will vs. Fate
+            </a>
+            <a href="neophyte-lesson-8.html" class="sidebar-link block px-6 py-3 font-sans text-sm tracking-wide text-gray-400">
+                8. Projection & Transference
+            </a>
+            <a href="neophyte-lesson-9.html" class="sidebar-link active block px-6 py-3 font-sans text-sm tracking-wide">
+                9. The Narrative Trap
+            </a>
+
+            <div class="mt-8 px-6 mb-4 text-xs font-sans text-gray-700 uppercase tracking-widest border-t border-white/5 pt-8">Next Step: Initiation</div>
+
+            <!-- FIXED: enabled link to Gate -->
+            <a href="./neophyte-lesson-10-gate.html" class="sidebar-link block px-6 py-3 font-sans text-sm tracking-wide text-gray-400">
+                <i class="fa-solid fa-torii-gate text-xs mr-2"></i> The Neophyte Gate
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-white/10">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center border border-white/10 shadow-inner">
+                    <span class="font-serif text-xs text-gold">N</span>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-center mb-1">
+                        <div class="text-xs font-serif text-paper">Neophyte 0°=0°</div>
+                        <div class="text-[10px] text-gold" id="progress-text">100%</div>
+                    </div>
+                    <div class="w-full bg-gray-900 h-1 rounded-full overflow-hidden">
+                        <div class="bg-gold h-full transition-all duration-1000" id="progress-bar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/80 hidden z-40 md:hidden backdrop-blur-sm transition-opacity"></div>
+
+    <main class="flex-1 overflow-y-auto relative custom-scrollbar md:ml-64">
+        
+        <div class="md:hidden fixed top-4 right-4 z-50">
+            <button id="menu-btn" class="w-10 h-10 bg-void/80 border border-gold/30 rounded-full text-gold flex items-center justify-center shadow-lg backdrop-blur">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-8 py-20">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="h-px w-8 bg-gold"></span>
+                <span class="font-sans text-xs tracking-[0.3em] text-gold uppercase">Lesson IX</span>
+            </div>
+            
+            <h1 class="font-serif text-4xl md:text-5xl text-paper mb-4 leading-tight">
+                The Narrative Trap<br>
+                <span class="text-gray-500 text-3xl">Geometry vs. Chronology</span>
+            </h1>
+            <p class="font-body text-xl text-gray-400 italic mb-12">"The Tarot is not a story you read. It is a machine you build."</p>
+
+            <section class="mb-20">
+                <h3 class="font-sans text-xs tracking-widest text-gold uppercase mb-6 border-b border-white/10 pb-2">01. Chronos vs. Kairos</h3>
+                <div class="prose prose-invert max-w-none text-gray-300 mb-8">
+                    <p>
+                        Beginners love the "Fool's Journey" because it is a story. It has a beginning (Fool), a middle (Tower), and an end (World). This is <strong>Chronos</strong> (Linear Time).
+                    </p>
+                    <p>
+                        But the Universe does not work in lines; it works in networks. The Magician (I) does not "meet" The High Priestess (II). They generate each other simultaneously, like the positive and negative poles of a battery. This is <strong>Kairos</strong> (Deep Structure).
+                    </p>
+                    <p>
+                        To master the Tarot, you must stop asking "What happens next?" and start asking "How does the circuit flow?"
+                    </p>
+                </div>
+            </section>
+
+            <section class="mb-20">
+                <h3 class="font-sans text-xs tracking-widest text-gold uppercase mb-6 border-b border-white/10 pb-2">02. The Reality Tuner</h3>
+                
+                <div class="flex flex-col items-center bg-black border border-white/10 p-8 rounded-sm">
+                    
+                    <div class="relative w-full max-w-lg h-[320px] bg-void border border-white/5 mb-8 overflow-hidden mode-linear transition-all" id="canvas">
+                        
+                        <svg class="circuit-lines w-full h-full">
+                            <path id="path-0-1" d="M250 50 L375 80" stroke="#333" stroke-width="1" />
+                            <path id="path-0-3" d="M250 50 L125 80" stroke="#333" stroke-width="1" />
+                            <path id="path-0-2" d="M250 50 L250 130" stroke="#333" stroke-width="1" />
+                            
+                            <circle class="energy-pulse" r="2">
+                                <animateMotion dur="2s" repeatCount="indefinite" path="M250 50 L375 80" />
+                            </circle>
+                            <circle class="energy-pulse" r="2">
+                                <animateMotion dur="2.5s" repeatCount="indefinite" path="M250 50 L125 80" />
+                            </circle>
+                            <circle class="energy-pulse" r="2">
+                                <animateMotion dur="1.8s" repeatCount="indefinite" path="M250 50 L250 130" />
+                            </circle>
+                        </svg>
+
+                        <div class="archetype-node node-0" title="Fool">0</div>
+                        <div class="archetype-node node-1" title="Magician">I</div>
+                        <div class="archetype-node node-2" title="Priestess">II</div>
+                        <div class="archetype-node node-3" title="Empress">III</div>
+                        <div class="archetype-node node-4" title="Emperor">IV</div>
+                        <div class="archetype-node node-5" title="Hierophant">V</div>
+
+                    </div>
+
+                    <div class="flex gap-4 mb-4">
+                        <button onclick="setMode('linear')" id="btn-linear" class="px-6 py-3 border border-chronos text-chronos bg-chronos/10 text-xs font-bold tracking-widest uppercase transition hover:text-white">
+                            <i class="fa-solid fa-arrow-right-long mr-2"></i> Linear (Story)
+                        </button>
+                        <button onclick="setMode('struct')" id="btn-struct" class="px-6 py-3 border border-white/10 text-gray-500 text-xs font-bold tracking-widest uppercase transition hover:border-kairos hover:text-kairos hover:bg-kairos/10">
+                            <i class="fa-solid fa-network-wired mr-2"></i> Structural (Circuit)
+                        </button>
+                    </div>
+
+                    <div id="desc-text" class="font-serif text-lg italic text-gray-500 text-center h-12">
+                        "First the Fool walks, then he meets the Magician..."
+                    </div>
+
+                </div>
+            </section>
+
+            <section class="mb-20">
+                <h3 class="font-sans text-xs tracking-widest text-gold uppercase mb-6 border-b border-white/10 pb-2">03. Narrative Breaker</h3>
+                <p class="text-gray-400 text-sm mb-6">Identify the flaw in the reading. Distinguish <strong>Story Logic</strong> from <strong>Circuit Logic</strong>.</p>
+
+                <div class="space-y-4">
+                    
+                    <div class="bg-white/5 border border-white/10 p-4">
+                        <p class="font-serif text-sm text-paper mb-2">Statement: "The Emperor follows the Empress because the father comes after the mother."</p>
+                        
+                        <div class="flex gap-2 mb-2">
+                            <button onclick="audit(this, 'story')" class="flex-1 py-3 border border-white/10 hover:bg-chronos/20 hover:border-chronos text-xs uppercase transition">
+                                Story Logic (Flawed)
+                            </button>
+                            <button onclick="audit(this, 'circuit')" class="flex-1 py-3 border border-white/10 hover:bg-kairos/20 hover:border-kairos text-xs uppercase transition">
+                                Circuit Logic (True)
+                            </button>
+                        </div>
+                        <div class="feedback hidden mt-2 text-xs font-mono text-right"></div>
+                    </div>
+
+                    <div class="bg-white/5 border border-white/10 p-4">
+                        <p class="font-serif text-sm text-paper mb-2">Statement: "The Emperor and Empress are the two sides of Authority (Force and Form); they exist simultaneously to stabilize the realm."</p>
+                        
+                        <div class="flex gap-2 mb-2">
+                            <button onclick="audit(this, 'story')" class="flex-1 py-3 border border-white/10 hover:bg-chronos/20 hover:border-chronos text-xs uppercase transition">
+                                Story Logic (Flawed)
+                            </button>
+                            <button onclick="audit(this, 'circuit')" class="flex-1 py-3 border border-white/10 hover:bg-kairos/20 hover:border-kairos text-xs uppercase transition">
+                                Circuit Logic (True)
+                            </button>
+                        </div>
+                        <div class="feedback hidden mt-2 text-xs font-mono text-right"></div>
+                    </div>
+
+                </div>
+            </section>
+
+            <div class="flex justify-between items-center border-t border-white/10 pt-8 mt-12">
+                <a href="neophyte-lesson-8.html" class="text-gray-500 hover:text-white font-sans text-xs tracking-widest uppercase transition">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Lesson VIII
+                </a>
+                
+                    <!-- FIXED: enabled footer link to Gate -->
+                <div class="flex flex-col items-end">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Neophyte Curriculum Complete</span>
+                    <a href="./neophyte-lesson-10-gate.html" class="group flex items-center gap-4">
+                        <div class="text-right">
+                            <div class="font-serif text-paper group-hover:text-gold transition">The Neophyte Gate</div>
+                        </div>
+                        <div class="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center group-hover:border-gold transition">
+                            <i class="fa-solid fa-arrow-right text-xs text-gray-400 group-hover:text-gold"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- Reality Tuner Logic ---
+        const canvas = document.getElementById('canvas');
+        const descText = document.getElementById('desc-text');
+        const btnLinear = document.getElementById('btn-linear');
+        const btnStruct = document.getElementById('btn-struct');
+        const nodes = document.querySelectorAll('.archetype-node');
+
+        function setMode(mode) {
+            if(mode === 'linear') {
+                canvas.className = "relative w-full max-w-lg h-[320px] bg-void border border-white/5 mb-8 overflow-hidden mode-linear transition-all";
+                descText.innerHTML = '"First the Fool walks, then he meets the Magician..."';
+                descText.style.color = "#6b7280"; // gray-500
+
+                // UI
+                btnLinear.classList.add('bg-chronos/10', 'text-chronos', 'border-chronos');
+                btnLinear.classList.remove('border-white/10', 'text-gray-500');
+                
+                btnStruct.classList.remove('bg-kairos/10', 'text-kairos', 'border-kairos');
+                btnStruct.classList.add('border-white/10', 'text-gray-500');
+
+                nodes.forEach(n => n.classList.remove('active'));
+
+            } else {
+                canvas.className = "relative w-full max-w-lg h-[320px] bg-void border border-white/5 mb-8 overflow-hidden mode-struct transition-all";
+                descText.innerHTML = '"Force (I) and Form (III) held in eternal tension."';
+                descText.style.color = "#c5a059"; // gold
+
+                // UI
+                btnStruct.classList.add('bg-kairos/10', 'text-kairos', 'border-kairos');
+                btnStruct.classList.remove('border-white/10', 'text-gray-500');
+
+                btnLinear.classList.remove('bg-chronos/10', 'text-chronos', 'border-chronos');
+                btnLinear.classList.add('border-white/10', 'text-gray-500');
+
+                nodes.forEach(n => n.classList.add('active'));
+            }
+        }
+
+        // --- Audit Logic ---
+        function audit(btn, type) {
+            const parent = btn.parentElement.parentElement;
+            const feedback = parent.querySelector('.feedback');
+            const isQ1 = parent.innerHTML.includes('father comes after');
+
+            let correct = false;
+            // Q1 is Story (Flawed)
+            if(isQ1 && type === 'story') correct = true;
+            // Q2 is Circuit (True)
+            if(!isQ1 && type === 'circuit') correct = true;
+
+            feedback.classList.remove('hidden');
+            if(correct) {
+                feedback.innerHTML = "<span class='text-kairos'>CORRECT.</span> Analysis Valid.";
+                btn.classList.add('bg-kairos/20', 'border-kairos');
+            } else {
+                feedback.innerHTML = "<span class='text-chronos'>INCORRECT.</span> Trap Detected.";
+                btn.classList.add('bg-chronos/20', 'border-chronos');
+            }
+        }
+
+        // Mobile Menu
+        const menuBtn = document.getElementById('menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function toggleMenu() {
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+    </script>
+</body>
+</html>

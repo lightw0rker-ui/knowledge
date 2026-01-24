@@ -1,0 +1,472 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM: ZELATOR // MODULE 05</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#030005', 
+                        obsidian: '#0a0a0f',
+                        silver: '#94a3b8',
+                        electric: '#a78bfa',
+                        
+                        // Suit Colors
+                        wands: '#ef4444',
+                        cups: '#3b82f6',
+                        swords: '#eab308',
+                        pentacles: '#22c55e',
+                    },
+                    fontFamily: {
+                        serif: ['"Cinzel"', 'serif'],
+                        body: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'grid': "url('data:image/svg+xml,%3Csvg width=\\'40\\' height=\\'40\\' viewBox=\\'0 0 40 40\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cpath d=\\'M0 0h40v40H0V0zm1 1h38v38H1V1z\\' fill=\\'%23a78bfa\\' fill-opacity=\\'0.02\\' fill-rule=\\'evenodd\\'/%3E%3C/svg%3E')",
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #030005;
+            color: #e2e8f0;
+        }
+
+        .tech-border {
+            position: relative;
+            background: rgba(10, 10, 15, 0.6);
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            transition: all 0.2s ease;
+        }
+        
+        .tech-border::before, .tech-border::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #a78bfa;
+            opacity: 0.5;
+        }
+        .tech-border::before { top: -1px; left: -1px; }
+        .tech-border::after { bottom: -1px; right: -1px; }
+
+        /* Input Controls */
+        .input-btn {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .input-btn:hover {
+            border-color: rgba(167, 139, 250, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .input-btn.selected {
+            border-color: #a78bfa;
+            background: rgba(167, 139, 250, 0.1);
+            box-shadow: 0 0 15px rgba(167, 139, 250, 0.15);
+            color: #fff;
+        }
+        
+        /* Suit-Specific Overrides */
+        .input-btn.selected[data-suit="wands"] { border-color: #ef4444; background: rgba(239, 68, 68, 0.1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
+        .input-btn.selected[data-suit="cups"] { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+        .input-btn.selected[data-suit="swords"] { border-color: #eab308; background: rgba(234, 179, 8, 0.1); box-shadow: 0 0 10px rgba(234, 179, 8, 0.2); }
+        .input-btn.selected[data-suit="pentacles"] { border-color: #22c55e; background: rgba(34, 197, 94, 0.1); box-shadow: 0 0 10px rgba(34, 197, 94, 0.2); }
+
+        /* Synthesis Animation */
+        .connector-line {
+            width: 2px;
+            background: #334155;
+            transition: all 0.5s ease;
+        }
+        .connector-line.active {
+            background: #a78bfa;
+            box-shadow: 0 0 8px #a78bfa;
+        }
+
+        /* Glitch Text Effect for "Compiling" */
+        .glitch-text {
+            position: relative;
+        }
+        .glitch-text::before, .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #030005;
+        }
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -1px 0 #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -1px 0 #00fff9;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim {
+            0% { clip: rect(12px, 9999px, 86px, 0); }
+            50% { clip: rect(54px, 9999px, 12px, 0); }
+            100% { clip: rect(10px, 9999px, 96px, 0); }
+        }
+
+    </style>
+</head>
+<body class="bg-void bg-grid min-h-screen flex overflow-hidden font-sans selection:bg-electric selection:text-black">
+
+    <aside class="w-72 border-r border-white/5 hidden md:flex flex-col z-20 bg-void/90 backdrop-blur-md h-screen">
+        <div class="p-6 border-b border-white/5">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 border border-electric/30 flex items-center justify-center bg-electric/5">
+                    <i class="fa-solid fa-cube text-electric text-xs"></i>
+                </div>
+                <div>
+                    <div class="font-mono text-[10px] text-electric tracking-[0.2em]">ESOTAROT</div>
+                    <div class="font-mono text-[10px] text-gray-500">MODULE 05 // LOADED</div>
+                </div>
+            </div>
+            
+            <a href="zelator-intro.html" class="group flex items-center gap-2 px-2 py-1 mb-2 text-[10px] font-mono text-gray-500 hover:text-white transition-colors">
+                <i class="fa-solid fa-arrow-left text-[8px] group-hover:-translate-x-1 transition-transform"></i> RETURN TO DASHBOARD
+            </a>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+            <div class="px-2 mb-4 font-mono text-[9px] text-gray-600 uppercase tracking-widest border-b border-white/5 pb-2">Sequence</div>
+            
+            <a href="zelator-lesson-3.html" class="block px-3 py-2 text-xs font-mono text-gray-500 hover:text-white hover:bg-white/5 border-l-2 border-transparent transition-all">
+                03 Involution Dynamics
+            </a>
+            <a href="zelator-lesson-4.html" class="block px-3 py-2 text-xs font-mono text-gray-500 hover:text-white hover:bg-white/5 border-l-2 border-transparent transition-all">
+                04 The Four Aces
+            </a>
+            <a href="#" class="block px-3 py-2 text-xs font-mono text-white bg-white/5 border-l-2 border-electric transition-all">
+                05 The Small Cards
+            </a>
+            <a href="zelator-lesson-6.html" class="block px-3 py-2 text-xs font-mono text-gray-500 hover:text-white hover:bg-white/5 border-l-2 border-transparent transition-all">
+                06 Color Scales
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-indigo-900/20 border border-indigo-500/30 flex items-center justify-center text-electric font-serif text-xs">Z</div>
+                <div>
+                    <div class="text-[10px] font-mono text-gray-400">INITIATE</div>
+                    <div class="text-[9px] font-mono text-gray-600">PROGRESS: 71%</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto relative custom-scrollbar z-10">
+        
+        <header class="max-w-7xl mx-auto px-8 py-16">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="h-px w-8 bg-electric"></span>
+                <span class="font-mono text-[10px] tracking-[0.3em] text-electric uppercase">Module 05</span>
+            </div>
+            
+            <h1 class="font-serif text-4xl md:text-5xl text-white mb-6 leading-tight">
+                Vector Synthesis<br>
+                <span class="text-gray-500 text-3xl">The Minor Arcana</span>
+            </h1>
+
+            <article class="max-w-3xl border-l border-electric/30 pl-6 mb-16">
+                <p class="font-body text-xl text-gray-300 leading-relaxed mb-4">
+                    Memorization is inefficient. Instead, learn to <strong>calculate</strong>.
+                </p>
+                <p class="font-mono text-xs text-gray-500 leading-relaxed mb-4">
+                    // ALGORITHM: Every card from 2 to 10 is the product of two variables: its Sephira (Number) and its World (Suit).
+                    <br>
+                    <span class="text-electric">MEANING = SEPHIRA_DEFINITION + SUIT_DEFINITION</span>
+                </p>
+                <p class="font-mono text-xs text-gray-500 leading-relaxed">
+                    // EXAMPLE: The 4 of Wands is simply Chesed (Structure/Stability) expressing itself through Fire (Energy). Stabilized Energy = "Completion."
+                </p>
+            </article>
+
+            <div class="bg-obsidian/50 border border-white/10 p-8 rounded-sm mb-16 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-electric to-transparent opacity-20"></div>
+                
+                <div class="flex flex-col lg:flex-row gap-12">
+                    
+                    <div class="w-full lg:w-1/3 flex flex-col gap-8">
+                        
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="font-mono text-[10px] text-gray-500 uppercase tracking-widest">Variable A: Sephira</span>
+                                <span class="text-[9px] text-electric" id="label-num">SELECT INPUT</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="setNum(2)" class="input-btn py-3 text-xs text-gray-400 hover:text-white num-btn" id="btn-n2">02</button>
+                                <button onclick="setNum(3)" class="input-btn py-3 text-xs text-gray-400 hover:text-white num-btn" id="btn-n3">03</button>
+                                <button onclick="setNum(4)" class="input-btn py-3 text-xs text-gray-400 hover:text-white num-btn" id="btn-n4">04</button>
+                                <button onclick="setNum(5)" class="input-btn py-3 text-xs text-gray-400 hover:text-white num-btn" id="btn-n5">05</button>
+                                <button onclick="setNum(6)" class="input-btn py-3 text-xs text-gray-400 hover:text-white num-btn" id="btn-n6">06</button>
+                                <button onclick="setNum(7)" class="input-btn py-3 text-xs text-gray-400 hover:text-white num-btn" id="btn-n7">07</button>
+                                <button onclick="setNum(8)" class="input-btn py-3 text-xs text-gray-400 hover:text-white num-btn" id="btn-n8">08</button>
+                                <button onclick="setNum(9)" class="input-btn py-3 text-xs text-gray-400 hover:text-white num-btn" id="btn-n9">09</button>
+                                <button onclick="setNum(10)" class="input-btn py-3 text-xs text-gray-400 hover:text-white num-btn" id="btn-n10">10</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="font-mono text-[10px] text-gray-500 uppercase tracking-widest">Variable B: Element</span>
+                                <span class="text-[9px] text-electric" id="label-suit">SELECT INPUT</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setSuit('wands')" class="input-btn py-4 text-xs text-gray-400 hover:text-wands suit-btn flex items-center justify-center gap-2" data-suit="wands" id="btn-wands">
+                                    <i class="fa-solid fa-fire"></i> FIRE
+                                </button>
+                                <button onclick="setSuit('cups')" class="input-btn py-4 text-xs text-gray-400 hover:text-cups suit-btn flex items-center justify-center gap-2" data-suit="cups" id="btn-cups">
+                                    <i class="fa-solid fa-glass-water"></i> WATER
+                                </button>
+                                <button onclick="setSuit('swords')" class="input-btn py-4 text-xs text-gray-400 hover:text-swords suit-btn flex items-center justify-center gap-2" data-suit="swords" id="btn-swords">
+                                    <i class="fa-solid fa-wind"></i> AIR
+                                </button>
+                                <button onclick="setSuit('pentacles')" class="input-btn py-4 text-xs text-gray-400 hover:text-pentacles suit-btn flex items-center justify-center gap-2" data-suit="pentacles" id="btn-pentacles">
+                                    <i class="fa-solid fa-gem"></i> EARTH
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="w-full lg:w-2/3 bg-black/40 border-l border-white/10 pl-0 lg:pl-12 flex flex-col justify-center min-h-[400px]">
+                        
+                        <div id="output-placeholder" class="text-center opacity-30">
+                            <i class="fa-solid fa-code-merge text-4xl mb-4"></i>
+                            <div class="font-mono text-xs">AWAITING INPUT VECTORS</div>
+                        </div>
+
+                        <div id="output-content" class="hidden w-full">
+                            
+                            <div class="mb-10 opacity-0 animate-fade-in" style="animation-delay: 0.1s">
+                                <div class="flex items-center gap-4 font-mono text-xs text-gray-500 mb-2">
+                                    <span>INPUT A</span>
+                                    <span class="w-4 h-px bg-gray-700"></span>
+                                    <span>INPUT B</span>
+                                </div>
+                                <div class="text-lg md:text-xl font-serif text-white flex flex-wrap items-center gap-3">
+                                    <span id="display-num-def" class="border-b border-gray-700 pb-1">--</span>
+                                    <span class="text-electric">+</span>
+                                    <span id="display-suit-def" class="border-b border-gray-700 pb-1">--</span>
+                                    <span class="text-electric">=</span>
+                                </div>
+                            </div>
+
+                            <div class="border border-white/10 bg-white/5 p-8 relative opacity-0 animate-fade-in" style="animation-delay: 0.3s">
+                                <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-serif" id="bg-number"></div>
+                                
+                                <div class="relative z-10">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div class="font-mono text-[10px] uppercase tracking-[0.3em] text-gray-400" id="result-tech-name">--</div>
+                                        <div id="result-icon" class="text-xl"></div>
+                                    </div>
+                                    
+                                    <h2 class="font-serif text-4xl md:text-5xl text-white mb-2" id="result-title">--</h2>
+                                    <div class="font-serif text-lg text-electric italic mb-6" id="result-gd-name">--</div>
+
+                                    <div class="h-px w-full bg-gradient-to-r from-white/20 to-transparent mb-6"></div>
+
+                                    <p class="font-mono text-xs text-gray-300 leading-relaxed max-w-xl" id="result-desc">
+                                        --
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+                <div class="bg-white/5 border border-white/10 p-6">
+                    <div class="font-mono text-[10px] text-gray-500 uppercase tracking-widest mb-3">Formula Logic</div>
+                    <h3 class="font-serif text-xl text-white mb-3">Stability vs. Instability</h3>
+                    <p class="font-body text-sm text-gray-400 leading-relaxed">
+                        Even numbers (2, 4, 6, 8) are stable. They represent balance and structure.
+                        <br>Odd numbers (3, 5, 7, 9) are unstable. They represent movement and conflict.
+                        <br><br>
+                        <span class="text-electric font-mono text-[10px]">RULE:</span> A 4 is always a "pause" or "room." A 5 is always a "breaking" or "motion."
+                    </p>
+                </div>
+                <div class="bg-white/5 border border-white/10 p-6">
+                    <div class="font-mono text-[10px] text-gray-500 uppercase tracking-widest mb-3">Elemental Physics</div>
+                    <h3 class="font-serif text-xl text-white mb-3">Resistance Calculation</h3>
+                    <p class="font-body text-sm text-gray-400 leading-relaxed">
+                        Fire and Air are active/light. Earth and Water are passive/heavy. 
+                        <br>When you put a heavy number (10) on a light suit (Wands), the energy is "oppressed." (10 of Wands = Oppression). When you put a light number (Ace) on a heavy suit, it is just a seed.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center border-t border-white/10 pt-8">
+                <a href="zelator-lesson-4.html" class="text-gray-500 hover:text-white font-mono text-xs tracking-widest uppercase transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Previous Protocol
+                </a>
+                <a href="zelator-lesson-6.html" class="group flex items-center gap-4">
+                    <div class="text-right">
+                        <div class="font-mono text-[9px] text-gray-500 tracking-[0.2em] uppercase">Next Protocol</div>
+                        <div class="font-serif text-white group-hover:text-electric transition">Color Scales</div>
+                    </div>
+                    <div class="w-10 h-10 border border-white/20 flex items-center justify-center group-hover:border-electric transition bg-white/5">
+                        <i class="fa-solid fa-arrow-right text-xs text-gray-400 group-hover:text-electric"></i>
+                    </div>
+                </a>
+            </div>
+            
+        </header>
+    </main>
+
+    <script>
+        let currentNum = null;
+        let currentSuit = null;
+
+        // Data Matrix
+        const numDefs = {
+            2: { name: "Chokmah", def: "Potential / Force" },
+            3: { name: "Binah", def: "Form / Sorrow" },
+            4: { name: "Chesed", def: "Stability / Mercy" },
+            5: { name: "Geburah", def: "Conflict / Severity" },
+            6: { name: "Tiphareth", def: "Harmony / Success" },
+            7: { name: "Netzach", def: "Unbalanced Force / Victory" },
+            8: { name: "Hod", def: "Intellect / Speed" },
+            9: { name: "Yesod", def: "Foundation / Strength" },
+            10: { name: "Malkuth", def: "Conclusion / Heaviness" }
+        };
+
+        const suitDefs = {
+            'wands': { name: "Fire", def: "Will / Energy", icon: '<i class="fa-solid fa-fire text-wands"></i>', color: 'text-wands' },
+            'cups': { name: "Water", def: "Emotion / Love", icon: '<i class="fa-solid fa-glass-water text-cups"></i>', color: 'text-cups' },
+            'swords': { name: "Air", def: "Mind / Strife", icon: '<i class="fa-solid fa-wind text-swords"></i>', color: 'text-swords' },
+            'pentacles': { name: "Earth", def: "Matter / Work", icon: '<i class="fa-solid fa-gem text-pentacles"></i>', color: 'text-pentacles' }
+        };
+
+        // The "Small Cards" Database (Golden Dawn Titles)
+        const cards = {
+            '2-wands': { title: "Dominion", gd: "Lord of Dominion", desc: "Energy (Fire) in its first balanced state. Willpower exerting control over territory." },
+            '3-wands': { title: "Virtue", gd: "Lord of Established Strength", desc: "Energy (Fire) taking form. The initial success leads to confidence and looking ahead." },
+            '4-wands': { title: "Completion", gd: "Lord of Perfected Work", desc: "Energy (Fire) stabilized. A moment of rest, celebration, and structural harmony." },
+            '5-wands': { title: "Strife", gd: "Lord of Strife", desc: "Energy (Fire) disrupted by severity. Competition, hassle, and volcanic pressure." },
+            '6-wands': { title: "Victory", gd: "Lord of Victory", desc: "Energy (Fire) balanced in the center. Success after the struggle of the 5. Public acclaim." },
+            '7-wands': { title: "Valour", gd: "Lord of Valour", desc: "Energy (Fire) becoming unbalanced and desperate. Fighting against the odds. Courage under fire." },
+            '8-wands': { title: "Swiftness", gd: "Lord of Swiftness", desc: "Energy (Fire) intellectualized. Fast communication, electrical signals, rapid movement." },
+            '9-wands': { title: "Strength", gd: "Lord of Great Strength", desc: "Energy (Fire) nearing the bottom. Defensive power, resilience, standing your ground." },
+            '10-wands': { title: "Oppression", gd: "Lord of Oppression", desc: "Energy (Fire) crushed by the weight of Earth (10). Too much will, too much burden. Burnout." },
+
+            '2-cups': { title: "Love", gd: "Lord of Love", desc: "Emotion (Water) in its first balanced state. The perfect reflection of one to another." },
+            '3-cups': { title: "Abundance", gd: "Lord of Abundance", desc: "Emotion (Water) taking form. Celebration, shared joy, and overflowing feelings." },
+            '4-cups': { title: "Luxury", gd: "Lord of Blended Pleasure", desc: "Emotion (Water) stabilized to the point of stagnation. Boredom, dissatisfaction with what is offered." },
+            '5-cups': { title: "Disappointment", gd: "Lord of Loss in Pleasure", desc: "Emotion (Water) disrupted. Grief, spilling the cup, focusing on what is lost." },
+            '6-cups': { title: "Pleasure", gd: "Lord of Pleasure", desc: "Emotion (Water) balanced in the center. Nostalgia, innocent joy, simple happiness." },
+            '7-cups': { title: "Debauch", gd: "Lord of Illusionary Success", desc: "Emotion (Water) unbalanced. Fantasy, delusion, choices that are not real. Fog." },
+            '8-cups': { title: "Indolence", gd: "Lord of Abandoned Success", desc: "Emotion (Water) realized as empty. Walking away from the cups to seek higher ground." },
+            '9-cups': { title: "Happiness", gd: "Lord of Material Happiness", desc: "Emotion (Water) grounded. Satisfaction, getting what you want, smugness." },
+            '10-cups': { title: "Satiety", gd: "Lord of Perfected Success", desc: "Emotion (Water) fully realized in Earth. The happy family, lasting peace." },
+
+            '2-swords': { title: "Peace", gd: "Lord of Peace Restored", desc: "Mind (Air) balanced. A truce. Two opposing thoughts held in perfect tension. Silence." },
+            '3-swords': { title: "Sorrow", gd: "Lord of Sorrow", desc: "Mind (Air) taking form as separation. The realization of a painful truth. Heartbreak." },
+            '4-swords': { title: "Truce", gd: "Lord of Rest from Strife", desc: "Mind (Air) stabilized. Meditation, retreat, giving the mind a structure to rest in." },
+            '5-swords': { title: "Defeat", gd: "Lord of Defeat", desc: "Mind (Air) disrupted. Cruelty, winning at all costs, the severity of intellect without mercy." },
+            '6-swords': { title: "Science", gd: "Lord of Earned Success", desc: "Mind (Air) balanced. Moving away from trouble using logic. Analytical problem solving." },
+            '7-swords': { title: "Futility", gd: "Lord of Unstable Effort", desc: "Mind (Air) unbalanced. Scheming, theft, trying to outwit the system. unstable plans." },
+            '8-swords': { title: "Interference", gd: "Lord of Shortened Force", desc: "Mind (Air) over-analyzing. trapped by one's own thoughts. Analysis paralysis." },
+            '9-swords': { title: "Cruelty", gd: "Lord of Despair and Cruelty", desc: "Mind (Air) haunting the foundation. Nightmares, anxiety, guilt, mental anguish." },
+            '10-swords': { title: "Ruin", gd: "Lord of Ruin", desc: "Mind (Air) fully grounded. The end of the thought process. Total collapse. Reset." },
+
+            '2-pentacles': { title: "Change", gd: "Lord of Harmonious Change", desc: "Matter (Earth) in balance with movement. Juggling resources. Adaptation." },
+            '3-pentacles': { title: "Works", gd: "Lord of Material Works", desc: "Matter (Earth) taking form. Construction, teamwork, initial building." },
+            '4-pentacles': { title: "Power", gd: "Lord of Earthly Power", desc: "Matter (Earth) stabilized. Hoarding, walls, keeping what is yours. Security." },
+            '5-pentacles': { title: "Worry", gd: "Lord of Material Trouble", desc: "Matter (Earth) disrupted. Poverty, loss of stability, physical hardship." },
+            '6-pentacles': { title: "Success", gd: "Lord of Material Success", desc: "Matter (Earth) balanced. Charity, exchange, the flow of resources." },
+            '7-pentacles': { title: "Failure", gd: "Lord of Success Unfulfilled", desc: "Matter (Earth) unbalanced. Waiting for the harvest. Anxiety about results." },
+            '8-pentacles': { title: "Prudence", gd: "Lord of Prudence", desc: "Matter (Earth) applied intellectually. Craftsmanship, attention to detail, repetitive work." },
+            '9-pentacles': { title: "Gain", gd: "Lord of Material Gain", desc: "Matter (Earth) grounded and secure. Self-sufficiency, enjoying the garden you planted." },
+            '10-pentacles': { title: "Wealth", gd: "Lord of Wealth", desc: "Matter (Earth) fully realized. Generational wealth, legacy, the permanent structure." }
+        };
+
+        function setNum(n) {
+            currentNum = n;
+            document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById(`btn-n${n}`).classList.add('selected');
+            document.getElementById('label-num').innerText = `SEPHIRA: ${n}`;
+            checkCalc();
+        }
+
+        function setSuit(s) {
+            currentSuit = s;
+            document.querySelectorAll('.suit-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById(`btn-${s}`).classList.add('selected');
+            document.getElementById('label-suit').innerText = `ELEMENT: ${s.toUpperCase()}`;
+            checkCalc();
+        }
+
+        function checkCalc() {
+            if (currentNum && currentSuit) {
+                const key = `${currentNum}-${currentSuit}`;
+                const card = cards[key];
+                const nDef = numDefs[currentNum];
+                const sDef = suitDefs[currentSuit];
+
+                // Hide placeholder, show content
+                document.getElementById('output-placeholder').classList.add('hidden');
+                const content = document.getElementById('output-content');
+                content.classList.remove('hidden');
+
+                // Re-trigger animations
+                content.querySelectorAll('.animate-fade-in').forEach(el => {
+                    el.classList.remove('animate-fade-in');
+                    void el.offsetWidth;
+                    el.classList.add('animate-fade-in');
+                });
+
+                // Update Data
+                document.getElementById('display-num-def').innerText = nDef.def;
+                document.getElementById('display-suit-def').innerText = sDef.def;
+                document.getElementById('display-suit-def').className = `border-b border-gray-700 pb-1 ${sDef.color}`;
+
+                document.getElementById('bg-number').innerText = currentNum;
+                document.getElementById('result-tech-name').innerText = `${currentNum} OF ${currentSuit.toUpperCase()}`;
+                document.getElementById('result-icon').innerHTML = sDef.icon;
+                
+                document.getElementById('result-title').innerText = card.title;
+                document.getElementById('result-title').className = `font-serif text-4xl md:text-5xl mb-2 ${sDef.color}`;
+                
+                document.getElementById('result-gd-name').innerText = `"${card.gd}"`;
+                document.getElementById('result-desc').innerText = card.desc;
+            }
+        }
+    </script>
+<!--\ FIXES-INJECTED\ -->\n<script>\ndocument\.addEventListener\("DOMContentLoaded",\ \(\)\ =>\ \{\n\ \ //\ safe\ clock\ updater\n\ \ const\ clockEl\ =\ document\.getElementById\('clock'\);\n\ \ if\ \(clockEl\)\ \{\n\ \ \ \ setInterval\(\(\)\ =>\ \{\n\ \ \ \ \ \ clockEl\.innerText\ =\ \(new\ Date\(\)\)\.toLocaleTimeString\('en-US',\ \{\ hour12:\ false\ }\);\n\ \ \ \ },\ 1000\);\n\ \ }\n\n\ \ //\ safe\ describe\ function\n\ \ const\ stackDesc\ =\ document\.getElementById\('stack-desc'\);\n\ \ const\ descriptions\ =\ \{\n\ \ \ \ 1:\ "<strong\ class='text-white'>ATZILUTH\ \(Archetypal\):</strong>\ The\ pure\ Will\ or\ Seed\.",\n\ \ \ \ 2:\ "<strong\ class='text-blue-400'>BRIAH\ \(Creative\):</strong>\ The\ Mental\ Architecture\.",\n\ \ \ \ 3:\ "<strong\ class='text-purple-400'>YETZIRAH\ \(Formative\):</strong>\ The\ Astral\ Blueprint\.",\n\ \ \ \ 4:\ "<strong\ class='text-orange-500'>ASSIAH\ \(Material\):</strong>\ The\ Physical\ Result\."\n\ \ };\n\ \ window\.describe\ =\ function\(layer\)\ \{\n\ \ \ \ if\ \(!stackDesc\)\ return;\n\ \ \ \ stackDesc\.innerHTML\ =\ descriptions\[layer]\ \|\|\ '';\n\ \ };\n\n\ \ //\ make\ stack-layer\ keyboard\ interactive\ if\ present\n\ \ document\.querySelectorAll\('\.stack-layer'\)\.forEach\(el\ =>\ \{\n\ \ \ \ if\ \(!el\.hasAttribute\('tabindex'\)\)\ el\.setAttribute\('tabindex','0'\);\n\ \ \ \ if\ \(!el\.hasAttribute\('role'\)\)\ el\.setAttribute\('role','button'\);\n\ \ \ \ //\ support\ keyboard\ activation\ to\ mirror\ onmouseenter\ behavior\n\ \ \ \ el\.addEventListener\('keydown',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ if\ \(e\.key\ ===\ 'Enter'\ \|\|\ e\.key\ ===\ '\ '\)\ \{\n\ \ \ \ \ \ \ \ e\.preventDefault\(\);\n\ \ \ \ \ \ \ \ //\ if\ element\ has\ onmouseenter\ attribute,\ try\ to\ extract\ layer\ number\ from\ innerText\n\ \ \ \ \ \ \ \ const\ m\ =\ el\.getAttribute\('onmouseenter'\)\ \|\|\ '';\n\ \ \ \ \ \ \ \ const\ match\ =\ m\.match\(/describe\\\(\(\\d\+\)\\\)/\);\n\ \ \ \ \ \ \ \ if\ \(match\)\ window\.describe\(Number\(match\[1]\)\);\n\ \ \ \ \ \ }\n\ \ \ \ }\);\n\ \ }\);\n\n\ \ //\ Oath\ checks\ \+\ unlock\ flow\ \(safe\ if\ absent\)\n\ \ const\ checks\ =\ Array\.from\(document\.querySelectorAll\('\.oath-check'\)\);\n\ \ const\ unlockBtn\ =\ document\.getElementById\('unlock-btn'\);\n\ \ const\ modulesGrid\ =\ document\.getElementById\('modules-grid'\);\n\ \ const\ header\ =\ document\.querySelector\('header'\);\n\n\ \ if\ \(checks\.length\ &&\ unlockBtn\ &&\ modulesGrid\)\ \{\n\ \ \ \ function\ updateState\(\)\ \{\n\ \ \ \ \ \ const\ allChecked\ =\ checks\.every\(c\ =>\ c\.checked\);\n\ \ \ \ \ \ unlockBtn\.disabled\ =\ !allChecked;\n\ \ \ \ \ \ unlockBtn\.setAttribute\('aria-disabled',\ String\(!allChecked\)\);\n\ \ \ \ }\n\n\ \ \ \ checks\.forEach\(check\ =>\ \{\n\ \ \ \ \ \ //\ visual\ sync\ for\ custom\ checkbox\n\ \ \ \ \ \ check\.addEventListener\('change',\ \(\)\ =>\ \{\n\ \ \ \ \ \ \ \ const\ box\ =\ check\.nextElementSibling;\n\ \ \ \ \ \ \ \ if\ \(box\)\ \{\n\ \ \ \ \ \ \ \ \ \ const\ icon\ =\ box\.querySelector\('i'\);\n\ \ \ \ \ \ \ \ \ \ if\ \(icon\)\ icon\.style\.opacity\ =\ check\.checked\ \?\ '1'\ :\ '0';\n\ \ \ \ \ \ \ \ }\n\ \ \ \ \ \ \ \ updateState\(\);\n\ \ \ \ \ \ }\);\n\n\ \ \ \ \ \ const\ label\ =\ check\.closest\('label'\);\n\ \ \ \ \ \ if\ \(label\)\ \{\n\ \ \ \ \ \ \ \ label\.addEventListener\('keydown',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ \ \ \ \ if\ \(e\.key\ ===\ '\ '\ \|\|\ e\.key\ ===\ 'Enter'\)\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ e\.preventDefault\(\);\n\ \ \ \ \ \ \ \ \ \ \ \ check\.checked\ =\ !check\.checked;\n\ \ \ \ \ \ \ \ \ \ \ \ check\.dispatchEvent\(new\ Event\('change',\ \{\ bubbles:\ true\ }\)\);\n\ \ \ \ \ \ \ \ \ \ }\n\ \ \ \ \ \ \ \ }\);\n\ \ \ \ \ \ \ \ label\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ \ \ \ \ if\ \(e\.target\ ===\ check\)\ return;\n\ \ \ \ \ \ \ \ \ \ check\.checked\ =\ !check\.checked;\n\ \ \ \ \ \ \ \ \ \ check\.dispatchEvent\(new\ Event\('change',\ \{\ bubbles:\ true\ }\)\);\n\ \ \ \ \ \ \ \ }\);\n\ \ \ \ \ \ }\n\ \ \ \ }\);\n\n\ \ \ \ unlockBtn\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ if\ \(unlockBtn\.disabled\)\ return;\n\ \ \ \ \ \ unlockBtn\.disabled\ =\ true;\n\ \ \ \ \ \ unlockBtn\.setAttribute\('aria-expanded',\ 'true'\);\n\ \ \ \ \ \ unlockBtn\.classList\.remove\('border-border',\ 'text-text'\);\n\ \ \ \ \ \ unlockBtn\.classList\.add\('border-success',\ 'text-success',\ 'bg-success/10'\);\n\ \ \ \ \ \ unlockBtn\.innerHTML\ =\ '<span\ class="relative\ z-10"><i\ class="fa-solid\ fa-check\ mr-2"></i>ACCESS\ GRANTED</span><div\ class="absolute\ inset-0\ bg-gold/5\ transform\ -translate-x-full\ group-hover:translate-x-0\ transition-transform\ duration-500\ ease-in-out"\ aria-hidden="true"></div>';\n\n\ \ \ \ \ \ //\ reveal\ modules\ safely\n\ \ \ \ \ \ modulesGrid\.classList\.remove\('opacity-30','pointer-events-none','grayscale','blur-\[2px]'\);\n\ \ \ \ \ \ modulesGrid\.setAttribute\('aria-hidden','false'\);\n\n\ \ \ \ \ \ //\ scroll\ to\ modules\ accounting\ for\ sticky\ header\n\ \ \ \ \ \ const\ headerHeight\ =\ header\ \?\ header\.offsetHeight\ :\ 0;\n\ \ \ \ \ \ const\ rectTop\ =\ modulesGrid\.getBoundingClientRect\(\)\.top\ \+\ window\.scrollY;\n\ \ \ \ \ \ const\ target\ =\ Math\.max\(0,\ rectTop\ -\ headerHeight\ -\ 12\);\n\ \ \ \ \ \ window\.scrollTo\(\{\ top:\ target,\ behavior:\ 'smooth'\ }\);\n\n\ \ \ \ \ \ //\ enable\ focus\ on\ links\ and\ focus\ first\ link\n\ \ \ \ \ \ setTimeout\(\(\)\ =>\ \{\n\ \ \ \ \ \ \ \ const\ links\ =\ modulesGrid\.querySelectorAll\('a\[href]'\);\n\ \ \ \ \ \ \ \ links\.forEach\(link\ =>\ link\.setAttribute\('tabindex','0'\)\);\n\ \ \ \ \ \ \ \ const\ first\ =\ modulesGrid\.querySelector\('a\[href]'\);\n\ \ \ \ \ \ \ \ if\ \(first\)\ first\.focus\(\);\n\ \ \ \ \ \ },\ 450\);\n\ \ \ \ }\);\n\n\ \ \ \ //\ ensure\ initial\ state\n\ \ \ \ updateState\(\);\n\ \ }\n\n\ \ //\ ensure\ module\ links\ are\ clickable\ even\ if\ some\ parent\ had\ pointer-events\ disabled\n\ \ document\.querySelectorAll\('\#modules-grid\ a\[href]'\)\.forEach\(a\ =>\ \{\n\ \ \ \ a\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ //\ ensure\ normal\ navigation\ on\ click\n\ \ \ \ \ \ if\ \(a\.getAttribute\('href'\)\)\ return;\n\ \ \ \ }\);\n\ \ \ \ //\ ensure\ correct\ relative\ href\ prefix\ \(best-effort\)\n\ \ \ \ const\ href\ =\ a\.getAttribute\('href'\)\ \|\|\ '';\n\ \ \ \ if\ \(href\ &&\ !href\.startsWith\('\./'\)\ &&\ !href\.startsWith\('http'\)\ &&\ !href\.startsWith\('/'\)\)\ \{\n\ \ \ \ \ \ a\.setAttribute\('href',\ '\./'\ \+\ href\);\n\ \ \ \ }\n\ \ }\);\n}\);\n</script><!--\ FIXES-INJECTED\ -->\n<script>\ndocument\.addEventListener\('DOMContentLoaded',\ \(\)\ =>\ \{\n\ \ try\ \{\n\ \ \ \ if\ \(!document\.getElementById\('console-output'\)\)\ \{\n\ \ \ \ \ \ const\ d\ =\ document\.createElement\('div'\);\ d\.id\ =\ 'console-output';\ d\.style\.display\ =\ 'none';\ document\.body\.appendChild\(d\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('unlock-btn'\)\)\ \{\n\ \ \ \ \ \ const\ b\ =\ document\.createElement\('button'\);\ b\.id\ =\ 'unlock-btn';\ b\.style\.display\ =\ 'none';\ document\.body\.appendChild\(b\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('modules-grid'\)\)\ \{\n\ \ \ \ \ \ const\ m\ =\ document\.createElement\('div'\);\ m\.id\ =\ 'modules-grid';\ m\.style\.display\ =\ 'none';\ document\.body\.appendChild\(m\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('stage-4'\)\)\ \{\n\ \ \ \ \ \ const\ s\ =\ document\.createElement\('section'\);\ s\.id\ =\ 'stage-4';\ s\.style\.display\ =\ 'none';\ document\.body\.appendChild\(s\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('option-c'\)\)\ \{\n\ \ \ \ \ \ const\ oc\ =\ document\.createElement\('button'\);\ oc\.id\ =\ 'option-c';\ oc\.style\.display\ =\ 'none';\ document\.body\.appendChild\(oc\);\n\ \ \ \ }\n\n\ \ \ \ document\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ const\ opt\ =\ e\.target\.closest\('\.option-btn'\);\n\ \ \ \ \ \ if\ \(opt\)\ \{\n\ \ \ \ \ \ \ \ const\ reason\ =\ opt\.dataset\.failure\ \|\|\ 'Incorrect\ choice\.';\n\ \ \ \ \ \ \ \ if\ \(typeof\ window\.failLog\ ===\ 'function'\)\ window\.failLog\(reason\);\n\ \ \ \ \ \ \ \ else\ console\.error\(reason\);\n\ \ \ \ \ \ }\n\ \ \ \ \ \ const\ oc\ =\ e\.target\.closest\('\#option-c'\);\n\ \ \ \ \ \ if\ \(oc\)\ \{\n\ \ \ \ \ \ \ \ if\ \(typeof\ window\.finishExam\ ===\ 'function'\)\ window\.finishExam\(\);\n\ \ \ \ \ \ }\n\ \ \ \ },\ true\);\n\ \ }\ catch\ \(err\)\ \{\n\ \ \ \ console\.error\('FIXES-INJECTED\ error',\ err\);\n\ \ }\n}\);\n</script></body>
+</html>
+

@@ -1,0 +1,434 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM: ZELATOR // MODULE 09</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#030005', 
+                        obsidian: '#0a0a0f',
+                        silver: '#94a3b8',
+                        electric: '#a78bfa',
+                        lunar: '#e2e8f0', // Moon White
+                        night: '#1e1b4b', // Deep Indigo
+                    },
+                    fontFamily: {
+                        serif: ['"Cinzel"', 'serif'],
+                        body: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'grid': "url('data:image/svg+xml,%3Csvg width=\\'40\\' height=\\'40\\' viewBox=\\'0 0 40 40\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cpath d=\\'M0 0h40v40H0V0zm1 1h38v38H1V1z\\' fill=\\'%2394a3b8\\' fill-opacity=\\'0.02\\' fill-rule=\\'evenodd\\'/%3E%3C/svg%3E')",
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'scan': 'scan 8s linear infinite',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #030005;
+            color: #e2e8f0;
+        }
+
+        .tech-border {
+            position: relative;
+            background: rgba(10, 10, 15, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.15); /* Silver Border */
+            transition: all 0.2s ease;
+        }
+        
+        .tech-border::before, .tech-border::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #94a3b8;
+            opacity: 0.5;
+        }
+        .tech-border::before { top: -1px; left: -1px; }
+        .tech-border::after { bottom: -1px; right: -1px; }
+
+        /* The Mirror Screens */
+        .mirror-screen {
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        /* The Source Object (Truth) */
+        .source-obj {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #fff;
+            background: transparent;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px #fff;
+        }
+
+        /* The Distorted Object (Illusion) */
+        .distorted-obj {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #a78bfa;
+            background: transparent;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px #a78bfa;
+            transition: all 0.1s ease-out;
+            /* Filters applied via JS */
+        }
+
+        /* Scanlines */
+        .scan-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px; width: 16px;
+            border-radius: 50%;
+            background: #94a3b8;
+            border: 2px solid #000;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 10px #94a3b8;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+        
+        /* Glitch Effect */
+        .glitch-anim {
+            animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+        }
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+
+    </style>
+</head>
+<body class="bg-void bg-grid min-h-screen flex overflow-hidden font-sans selection:bg-electric selection:text-black">
+
+    <aside class="w-72 border-r border-white/5 hidden md:flex flex-col z-20 bg-void/90 backdrop-blur-md h-screen">
+        <div class="p-6 border-b border-white/5">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 border border-electric/30 flex items-center justify-center bg-electric/5">
+                    <i class="fa-solid fa-cube text-electric text-xs"></i>
+                </div>
+                <div>
+                    <div class="font-mono text-[10px] text-electric tracking-[0.2em]">ESOTAROT</div>
+                    <div class="font-mono text-[10px] text-gray-500">MODULE 09 // LOADED</div>
+                </div>
+            </div>
+            
+            <a href="zelator-intro.html" class="group flex items-center gap-2 px-2 py-1 mb-2 text-[10px] font-mono text-gray-500 hover:text-white transition-colors">
+                <i class="fa-solid fa-arrow-left text-[8px] group-hover:-translate-x-1 transition-transform"></i> RETURN TO DASHBOARD
+            </a>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+            <div class="px-2 mb-4 font-mono text-[9px] text-gray-600 uppercase tracking-widest border-b border-white/5 pb-2">Sequence</div>
+            
+            <a href="zelator-lesson-7.html" class="block px-3 py-2 text-xs font-mono text-gray-500 hover:text-white hover:bg-white/5 border-l-2 border-transparent transition-all">
+                07 Binah vs. Chokmah
+            </a>
+            <a href="zelator-lesson-8.html" class="block px-3 py-2 text-xs font-mono text-gray-500 hover:text-white hover:bg-white/5 border-l-2 border-transparent transition-all">
+                08 Tiphareth Center
+            </a>
+            <a href="#" class="block px-3 py-2 text-xs font-mono text-white bg-white/5 border-l-2 border-electric transition-all">
+                09 Yesod Machinery
+            </a>
+            <a href="zelator-intro.html" class="block px-3 py-2 text-xs font-mono text-gray-500 hover:text-white hover:bg-white/5 border-l-2 border-transparent transition-all">
+                10 Gate: Theoricus
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-indigo-900/20 border border-indigo-500/30 flex items-center justify-center text-electric font-serif text-xs">Z</div>
+                <div>
+                    <div class="text-[10px] font-mono text-gray-400">INITIATE</div>
+                    <div class="text-[9px] font-mono text-gray-600">PROGRESS: 99%</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto relative custom-scrollbar z-10">
+        
+        <header class="max-w-7xl mx-auto px-8 py-16">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="h-px w-8 bg-silver"></span>
+                <span class="font-mono text-[10px] tracking-[0.3em] text-silver uppercase">Module 09</span>
+            </div>
+            
+            <h1 class="font-serif text-4xl md:text-5xl text-white mb-6 leading-tight">
+                Yesod<br>
+                <span class="text-gray-500 text-3xl">The Rendering Engine</span>
+            </h1>
+
+            <article class="max-w-3xl border-l border-silver/30 pl-6 mb-16">
+                <p class="font-body text-xl text-gray-300 leading-relaxed mb-4">
+                    You do not see reality. You see a <span class="text-white italic">rendering</span> of reality. Yesod is the automatic machinery that takes raw data and applies textures, lighting, and filters based on your past memories.
+                </p>
+                <p class="font-mono text-xs text-gray-500 leading-relaxed mb-4">
+                    // ARCHITECTURE: Kether provides the Signal. Malkuth provides the Screen. Yesod is the Projector Lens. If the lens is dirty (bias/fear), the image on the screen will be distorted.
+                </p>
+                <p class="font-mono text-xs text-gray-500 leading-relaxed">
+                    // PROTOCOL: "Reality Testing" is the process of cleaning the lens. We must separate the raw event (Data) from the story we tell about it (Render).
+                </p>
+            </article>
+
+            <div class="tech-border bg-obsidian/50 p-8 rounded-sm mb-16 shadow-2xl">
+                
+                <div class="flex flex-col lg:flex-row gap-12">
+                    
+                    <div class="w-full lg:w-2/3">
+                        <div class="flex justify-between items-end mb-4">
+                            <div class="font-mono text-[10px] text-gray-500 uppercase tracking-widest">
+                                <span class="text-white">SOURCE FEED</span> [TRUTH]
+                            </div>
+                            <div class="font-mono text-[10px] text-gray-500 uppercase tracking-widest">
+                                [RENDER] <span class="text-electric">PROJECTED REALITY</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-1 h-64 border border-white/10 bg-black">
+                            
+                            <div class="mirror-screen border-r border-white/10">
+                                <div class="scan-overlay"></div>
+                                <div class="source-obj"></div>
+                                <div class="absolute bottom-2 left-2 font-mono text-[8px] text-gray-500">RAW DATA</div>
+                            </div>
+
+                            <div class="mirror-screen">
+                                <div class="scan-overlay"></div>
+                                <div class="distorted-obj" id="render-obj"></div>
+                                <div class="absolute bottom-2 right-2 font-mono text-[8px] text-electric">OUTPUT</div>
+                                
+                                <div id="distortion-alert" class="absolute inset-0 flex items-center justify-center bg-black/80 hidden">
+                                    <div class="text-center">
+                                        <i class="fa-solid fa-triangle-exclamation text-red-500 text-2xl mb-2 animate-pulse"></i>
+                                        <div class="font-mono text-[10px] text-red-400">SIGNAL CORRUPTED</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-4 flex justify-between items-center border-t border-white/5 pt-4">
+                            <div class="font-mono text-[9px] text-gray-500">
+                                FILTER STATUS: <span id="status-text" class="text-white">NORMAL</span>
+                            </div>
+                            <button onclick="cleanLens()" class="px-4 py-2 border border-white/10 hover:bg-white/5 text-[9px] font-mono text-electric hover:text-white transition uppercase">
+                                <i class="fa-solid fa-rotate-right mr-1"></i> Clean Lens
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="w-full lg:w-1/3 flex flex-col justify-center space-y-6">
+                        
+                        <div>
+                            <div class="flex justify-between font-mono text-[9px] text-gray-500 mb-2">
+                                <span>PAST TRAUMA (BIAS)</span>
+                                <span id="val-bias">0%</span>
+                            </div>
+                            <input type="range" min="0" max="100" value="0" id="slide-bias" oninput="updateRender()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between font-mono text-[9px] text-gray-500 mb-2">
+                                <span>EMOTIONAL NOISE (ANXIETY)</span>
+                                <span id="val-noise">0%</span>
+                            </div>
+                            <input type="range" min="0" max="100" value="0" id="slide-noise" oninput="updateRender()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between font-mono text-[9px] text-gray-500 mb-2">
+                                <span>WISHFUL THINKING (DESIRE)</span>
+                                <span id="val-desire">0%</span>
+                            </div>
+                            <input type="range" min="0" max="100" value="0" id="slide-desire" oninput="updateRender()">
+                        </div>
+
+                        <div class="bg-white/5 p-4 border-l-2 border-electric mt-4">
+                            <div class="font-mono text-[9px] text-gray-500 uppercase mb-1">Operational Note</div>
+                            <p class="font-body text-xs text-gray-400 leading-relaxed" id="analysis-text">
+                                The signal is clear. You are seeing the event exactly as it happened, without adding meaning.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-20">
+                <div class="flex items-center gap-4 mb-6">
+                    <span class="h-px w-8 bg-electric"></span>
+                    <h2 class="font-serif text-2xl text-white">Reality Testing Protocol</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="font-body text-sm text-gray-400 leading-relaxed mb-4">
+                            Use this terminal to debug a reaction. When you feel a strong emotion (Yesod), it means a filter has been applied. 
+                        </p>
+                        <ul class="space-y-2 font-mono text-[10px] text-gray-500">
+                            <li><span class="text-electric">1. INPUT:</span> What actually happened? (Data only).</li>
+                            <li><span class="text-electric">2. RENDER:</span> What did you tell yourself it meant?</li>
+                            <li><span class="text-electric">3. DEBUG:</span> What is the alternative explanation?</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-black border border-white/10 p-6 font-mono text-xs">
+                        <div class="mb-4">
+                            <label class="block text-gray-600 mb-1">> DATA_INPUT (FACT)</label>
+                            <input type="text" class="w-full bg-white/5 border border-white/10 p-2 text-white focus:border-electric focus:outline-none" placeholder="e.g., They did not reply to the text.">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-600 mb-1">> RENDER_OUTPUT (STORY)</label>
+                            <input type="text" class="w-full bg-white/5 border border-white/10 p-2 text-electric focus:border-electric focus:outline-none" placeholder="e.g., They are angry with me.">
+                        </div>
+                        <button class="w-full py-2 bg-white/5 hover:bg-white/10 text-gray-400 border border-white/10 hover:text-white transition">RUN DIAGNOSTIC</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center border-t border-white/10 pt-8">
+                <a href="zelator-lesson-8.html" class="text-gray-500 hover:text-white font-mono text-xs tracking-widest uppercase transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Previous Protocol
+                </a>
+                <a href="zelator-intro.html" class="group flex items-center gap-4">
+                    <div class="text-right">
+                        <div class="font-mono text-[9px] text-gray-500 tracking-[0.2em] uppercase">Final Gate</div>
+                        <div class="font-serif text-white group-hover:text-electric transition">Theoricus Exam</div>
+                    </div>
+                    <div class="w-10 h-10 border border-white/20 flex items-center justify-center group-hover:border-electric transition bg-white/5">
+                        <i class="fa-solid fa-key text-xs text-gray-400 group-hover:text-electric"></i>
+                    </div>
+                </a>
+            </div>
+            
+        </header>
+    </main>
+
+    <script>
+        const obj = document.getElementById('render-obj');
+        const alertBox = document.getElementById('distortion-alert');
+        const statusText = document.getElementById('status-text');
+        const analysisText = document.getElementById('analysis-text');
+
+        const sBias = document.getElementById('slide-bias');
+        const sNoise = document.getElementById('slide-noise');
+        const sDesire = document.getElementById('slide-desire');
+
+        const vBias = document.getElementById('val-bias');
+        const vNoise = document.getElementById('val-noise');
+        const vDesire = document.getElementById('val-desire');
+
+        function updateRender() {
+            const bias = parseInt(sBias.value);
+            const noise = parseInt(sNoise.value);
+            const desire = parseInt(sDesire.value);
+
+            // Update UI Numbers
+            vBias.innerText = bias + '%';
+            vNoise.innerText = noise + '%';
+            vDesire.innerText = desire + '%';
+
+            // Apply Filters
+            // Bias = Hue Rotate & Skew
+            // Noise = Blur & Glitch
+            // Desire = Scale & Brightness (Bloom)
+            
+            const skew = bias / 2;
+            const blur = noise / 10;
+            const scale = 1 + (desire / 200);
+            const brightness = 100 + (desire / 2);
+            const hue = bias * 2;
+
+            obj.style.transform = `rotate(45deg) skew(${skew}deg) scale(${scale})`;
+            obj.style.filter = `blur(${blur}px) hue-rotate(${hue}deg) brightness(${brightness}%)`;
+            
+            // Glitch Effect
+            if (noise > 50) {
+                obj.classList.add('glitch-anim');
+            } else {
+                obj.classList.remove('glitch-anim');
+            }
+
+            // Status Logic
+            const totalLoad = bias + noise + desire;
+
+            if (totalLoad === 0) {
+                statusText.innerText = "NORMAL";
+                statusText.className = "text-white";
+                alertBox.classList.add('hidden');
+                analysisText.innerText = "The signal is clear. You are seeing the event exactly as it happened, without adding meaning.";
+            } else if (totalLoad < 100) {
+                statusText.innerText = "DISTORTED";
+                statusText.className = "text-electric";
+                alertBox.classList.add('hidden');
+                analysisText.innerText = "Minor Rendering Artifacts detected. You are adding a layer of interpretation to the raw data.";
+            } else {
+                statusText.innerText = "CORRUPTED";
+                statusText.className = "text-red-500";
+                alertBox.classList.remove('hidden');
+                analysisText.innerText = "CRITICAL FAILURE. The projection has overtaken the reality. You are no longer seeing the object; you are seeing your own filter.";
+            }
+        }
+
+        function cleanLens() {
+            sBias.value = 0;
+            sNoise.value = 0;
+            sDesire.value = 0;
+            updateRender();
+        }
+
+    </script>
+<!--\ FIXES-INJECTED\ -->\n<script>\ndocument\.addEventListener\("DOMContentLoaded",\ \(\)\ =>\ \{\n\ \ //\ safe\ clock\ updater\n\ \ const\ clockEl\ =\ document\.getElementById\('clock'\);\n\ \ if\ \(clockEl\)\ \{\n\ \ \ \ setInterval\(\(\)\ =>\ \{\n\ \ \ \ \ \ clockEl\.innerText\ =\ \(new\ Date\(\)\)\.toLocaleTimeString\('en-US',\ \{\ hour12:\ false\ }\);\n\ \ \ \ },\ 1000\);\n\ \ }\n\n\ \ //\ safe\ describe\ function\n\ \ const\ stackDesc\ =\ document\.getElementById\('stack-desc'\);\n\ \ const\ descriptions\ =\ \{\n\ \ \ \ 1:\ "<strong\ class='text-white'>ATZILUTH\ \(Archetypal\):</strong>\ The\ pure\ Will\ or\ Seed\.",\n\ \ \ \ 2:\ "<strong\ class='text-blue-400'>BRIAH\ \(Creative\):</strong>\ The\ Mental\ Architecture\.",\n\ \ \ \ 3:\ "<strong\ class='text-purple-400'>YETZIRAH\ \(Formative\):</strong>\ The\ Astral\ Blueprint\.",\n\ \ \ \ 4:\ "<strong\ class='text-orange-500'>ASSIAH\ \(Material\):</strong>\ The\ Physical\ Result\."\n\ \ };\n\ \ window\.describe\ =\ function\(layer\)\ \{\n\ \ \ \ if\ \(!stackDesc\)\ return;\n\ \ \ \ stackDesc\.innerHTML\ =\ descriptions\[layer]\ \|\|\ '';\n\ \ };\n\n\ \ //\ make\ stack-layer\ keyboard\ interactive\ if\ present\n\ \ document\.querySelectorAll\('\.stack-layer'\)\.forEach\(el\ =>\ \{\n\ \ \ \ if\ \(!el\.hasAttribute\('tabindex'\)\)\ el\.setAttribute\('tabindex','0'\);\n\ \ \ \ if\ \(!el\.hasAttribute\('role'\)\)\ el\.setAttribute\('role','button'\);\n\ \ \ \ //\ support\ keyboard\ activation\ to\ mirror\ onmouseenter\ behavior\n\ \ \ \ el\.addEventListener\('keydown',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ if\ \(e\.key\ ===\ 'Enter'\ \|\|\ e\.key\ ===\ '\ '\)\ \{\n\ \ \ \ \ \ \ \ e\.preventDefault\(\);\n\ \ \ \ \ \ \ \ //\ if\ element\ has\ onmouseenter\ attribute,\ try\ to\ extract\ layer\ number\ from\ innerText\n\ \ \ \ \ \ \ \ const\ m\ =\ el\.getAttribute\('onmouseenter'\)\ \|\|\ '';\n\ \ \ \ \ \ \ \ const\ match\ =\ m\.match\(/describe\\\(\(\\d\+\)\\\)/\);\n\ \ \ \ \ \ \ \ if\ \(match\)\ window\.describe\(Number\(match\[1]\)\);\n\ \ \ \ \ \ }\n\ \ \ \ }\);\n\ \ }\);\n\n\ \ //\ Oath\ checks\ \+\ unlock\ flow\ \(safe\ if\ absent\)\n\ \ const\ checks\ =\ Array\.from\(document\.querySelectorAll\('\.oath-check'\)\);\n\ \ const\ unlockBtn\ =\ document\.getElementById\('unlock-btn'\);\n\ \ const\ modulesGrid\ =\ document\.getElementById\('modules-grid'\);\n\ \ const\ header\ =\ document\.querySelector\('header'\);\n\n\ \ if\ \(checks\.length\ &&\ unlockBtn\ &&\ modulesGrid\)\ \{\n\ \ \ \ function\ updateState\(\)\ \{\n\ \ \ \ \ \ const\ allChecked\ =\ checks\.every\(c\ =>\ c\.checked\);\n\ \ \ \ \ \ unlockBtn\.disabled\ =\ !allChecked;\n\ \ \ \ \ \ unlockBtn\.setAttribute\('aria-disabled',\ String\(!allChecked\)\);\n\ \ \ \ }\n\n\ \ \ \ checks\.forEach\(check\ =>\ \{\n\ \ \ \ \ \ //\ visual\ sync\ for\ custom\ checkbox\n\ \ \ \ \ \ check\.addEventListener\('change',\ \(\)\ =>\ \{\n\ \ \ \ \ \ \ \ const\ box\ =\ check\.nextElementSibling;\n\ \ \ \ \ \ \ \ if\ \(box\)\ \{\n\ \ \ \ \ \ \ \ \ \ const\ icon\ =\ box\.querySelector\('i'\);\n\ \ \ \ \ \ \ \ \ \ if\ \(icon\)\ icon\.style\.opacity\ =\ check\.checked\ \?\ '1'\ :\ '0';\n\ \ \ \ \ \ \ \ }\n\ \ \ \ \ \ \ \ updateState\(\);\n\ \ \ \ \ \ }\);\n\n\ \ \ \ \ \ const\ label\ =\ check\.closest\('label'\);\n\ \ \ \ \ \ if\ \(label\)\ \{\n\ \ \ \ \ \ \ \ label\.addEventListener\('keydown',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ \ \ \ \ if\ \(e\.key\ ===\ '\ '\ \|\|\ e\.key\ ===\ 'Enter'\)\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ e\.preventDefault\(\);\n\ \ \ \ \ \ \ \ \ \ \ \ check\.checked\ =\ !check\.checked;\n\ \ \ \ \ \ \ \ \ \ \ \ check\.dispatchEvent\(new\ Event\('change',\ \{\ bubbles:\ true\ }\)\);\n\ \ \ \ \ \ \ \ \ \ }\n\ \ \ \ \ \ \ \ }\);\n\ \ \ \ \ \ \ \ label\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ \ \ \ \ if\ \(e\.target\ ===\ check\)\ return;\n\ \ \ \ \ \ \ \ \ \ check\.checked\ =\ !check\.checked;\n\ \ \ \ \ \ \ \ \ \ check\.dispatchEvent\(new\ Event\('change',\ \{\ bubbles:\ true\ }\)\);\n\ \ \ \ \ \ \ \ }\);\n\ \ \ \ \ \ }\n\ \ \ \ }\);\n\n\ \ \ \ unlockBtn\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ if\ \(unlockBtn\.disabled\)\ return;\n\ \ \ \ \ \ unlockBtn\.disabled\ =\ true;\n\ \ \ \ \ \ unlockBtn\.setAttribute\('aria-expanded',\ 'true'\);\n\ \ \ \ \ \ unlockBtn\.classList\.remove\('border-border',\ 'text-text'\);\n\ \ \ \ \ \ unlockBtn\.classList\.add\('border-success',\ 'text-success',\ 'bg-success/10'\);\n\ \ \ \ \ \ unlockBtn\.innerHTML\ =\ '<span\ class="relative\ z-10"><i\ class="fa-solid\ fa-check\ mr-2"></i>ACCESS\ GRANTED</span><div\ class="absolute\ inset-0\ bg-gold/5\ transform\ -translate-x-full\ group-hover:translate-x-0\ transition-transform\ duration-500\ ease-in-out"\ aria-hidden="true"></div>';\n\n\ \ \ \ \ \ //\ reveal\ modules\ safely\n\ \ \ \ \ \ modulesGrid\.classList\.remove\('opacity-30','pointer-events-none','grayscale','blur-\[2px]'\);\n\ \ \ \ \ \ modulesGrid\.setAttribute\('aria-hidden','false'\);\n\n\ \ \ \ \ \ //\ scroll\ to\ modules\ accounting\ for\ sticky\ header\n\ \ \ \ \ \ const\ headerHeight\ =\ header\ \?\ header\.offsetHeight\ :\ 0;\n\ \ \ \ \ \ const\ rectTop\ =\ modulesGrid\.getBoundingClientRect\(\)\.top\ \+\ window\.scrollY;\n\ \ \ \ \ \ const\ target\ =\ Math\.max\(0,\ rectTop\ -\ headerHeight\ -\ 12\);\n\ \ \ \ \ \ window\.scrollTo\(\{\ top:\ target,\ behavior:\ 'smooth'\ }\);\n\n\ \ \ \ \ \ //\ enable\ focus\ on\ links\ and\ focus\ first\ link\n\ \ \ \ \ \ setTimeout\(\(\)\ =>\ \{\n\ \ \ \ \ \ \ \ const\ links\ =\ modulesGrid\.querySelectorAll\('a\[href]'\);\n\ \ \ \ \ \ \ \ links\.forEach\(link\ =>\ link\.setAttribute\('tabindex','0'\)\);\n\ \ \ \ \ \ \ \ const\ first\ =\ modulesGrid\.querySelector\('a\[href]'\);\n\ \ \ \ \ \ \ \ if\ \(first\)\ first\.focus\(\);\n\ \ \ \ \ \ },\ 450\);\n\ \ \ \ }\);\n\n\ \ \ \ //\ ensure\ initial\ state\n\ \ \ \ updateState\(\);\n\ \ }\n\n\ \ //\ ensure\ module\ links\ are\ clickable\ even\ if\ some\ parent\ had\ pointer-events\ disabled\n\ \ document\.querySelectorAll\('\#modules-grid\ a\[href]'\)\.forEach\(a\ =>\ \{\n\ \ \ \ a\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ //\ ensure\ normal\ navigation\ on\ click\n\ \ \ \ \ \ if\ \(a\.getAttribute\('href'\)\)\ return;\n\ \ \ \ }\);\n\ \ \ \ //\ ensure\ correct\ relative\ href\ prefix\ \(best-effort\)\n\ \ \ \ const\ href\ =\ a\.getAttribute\('href'\)\ \|\|\ '';\n\ \ \ \ if\ \(href\ &&\ !href\.startsWith\('\./'\)\ &&\ !href\.startsWith\('http'\)\ &&\ !href\.startsWith\('/'\)\)\ \{\n\ \ \ \ \ \ a\.setAttribute\('href',\ '\./'\ \+\ href\);\n\ \ \ \ }\n\ \ }\);\n}\);\n</script><!--\ FIXES-INJECTED\ -->\n<script>\ndocument\.addEventListener\('DOMContentLoaded',\ \(\)\ =>\ \{\n\ \ try\ \{\n\ \ \ \ if\ \(!document\.getElementById\('console-output'\)\)\ \{\n\ \ \ \ \ \ const\ d\ =\ document\.createElement\('div'\);\ d\.id\ =\ 'console-output';\ d\.style\.display\ =\ 'none';\ document\.body\.appendChild\(d\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('unlock-btn'\)\)\ \{\n\ \ \ \ \ \ const\ b\ =\ document\.createElement\('button'\);\ b\.id\ =\ 'unlock-btn';\ b\.style\.display\ =\ 'none';\ document\.body\.appendChild\(b\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('modules-grid'\)\)\ \{\n\ \ \ \ \ \ const\ m\ =\ document\.createElement\('div'\);\ m\.id\ =\ 'modules-grid';\ m\.style\.display\ =\ 'none';\ document\.body\.appendChild\(m\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('stage-4'\)\)\ \{\n\ \ \ \ \ \ const\ s\ =\ document\.createElement\('section'\);\ s\.id\ =\ 'stage-4';\ s\.style\.display\ =\ 'none';\ document\.body\.appendChild\(s\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('option-c'\)\)\ \{\n\ \ \ \ \ \ const\ oc\ =\ document\.createElement\('button'\);\ oc\.id\ =\ 'option-c';\ oc\.style\.display\ =\ 'none';\ document\.body\.appendChild\(oc\);\n\ \ \ \ }\n\n\ \ \ \ document\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ const\ opt\ =\ e\.target\.closest\('\.option-btn'\);\n\ \ \ \ \ \ if\ \(opt\)\ \{\n\ \ \ \ \ \ \ \ const\ reason\ =\ opt\.dataset\.failure\ \|\|\ 'Incorrect\ choice\.';\n\ \ \ \ \ \ \ \ if\ \(typeof\ window\.failLog\ ===\ 'function'\)\ window\.failLog\(reason\);\n\ \ \ \ \ \ \ \ else\ console\.error\(reason\);\n\ \ \ \ \ \ }\n\ \ \ \ \ \ const\ oc\ =\ e\.target\.closest\('\#option-c'\);\n\ \ \ \ \ \ if\ \(oc\)\ \{\n\ \ \ \ \ \ \ \ if\ \(typeof\ window\.finishExam\ ===\ 'function'\)\ window\.finishExam\(\);\n\ \ \ \ \ \ }\n\ \ \ \ },\ true\);\n\ \ }\ catch\ \(err\)\ \{\n\ \ \ \ console\.error\('FIXES-INJECTED\ error',\ err\);\n\ \ }\n}\);\n</script></body>
+</html>
+

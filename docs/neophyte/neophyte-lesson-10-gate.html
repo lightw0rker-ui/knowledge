@@ -1,0 +1,346 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EsoTarot | The First Gate: Neophyte Initiation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+            tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#050505',
+                        paper: '#e0d8c3',
+                        gold: '#c5a059',
+                        golddim: '#8a6e36',
+                        gate: '#0a0a0a',
+                        terminal: '#33ff00', // Success green
+                        lock: '#ff3333',     // Locked red
+                    },
+                    fontFamily: {
+                        serif: ['"Cinzel"', 'serif'],
+                        body: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'noise': "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.07%22/%3E%3C/svg%3E')",
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Base */
+        html, body {
+            box-sizing: border-box;
+            background-color: #050505;
+            color: #e0d8c3;
+            height: 100%;
+            overflow: hidden; /* Lock scroll for initiation */
+        }
+        *, *:before, *:after { box-sizing: inherit; }
+
+        /* The Great Gates */
+        .gate-door {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background: #080808;
+            border-color: #222;
+            z-index: 40;
+            transition: transform 3s cubic-bezier(0.6, 0.05, 0.2, 1), box-shadow 3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .gate-left {
+            left: 0;
+            border-right: 1px solid #333;
+            justify-content: flex-end;
+            background: linear-gradient(90deg, #050505 0%, #111 100%);
+        }
+        
+        .gate-right {
+            right: 0;
+            border-left: 1px solid #333;
+            justify-content: flex-start;
+            background: linear-gradient(-90deg, #050505 0%, #111 100%);
+        }
+
+        /* Gate Textures */
+        .gate-texture {
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: repeating-linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), repeating-linear-gradient(45deg, #000 25%, #0a0a0a 25%, #0a0a0a 75%, #000 75%, #000);
+            background-position: 0 0, 10px 10px;
+            background-size: 20px 20px;
+        }
+
+        /* Opening Animation */
+        .gate-open .gate-left {
+            transform: translateX(-100%);
+            box-shadow: 20px 0 50px rgba(197, 160, 89, 0.2);
+        }
+        .gate-open .gate-right {
+            transform: translateX(100%);
+            box-shadow: -20px 0 50px rgba(197, 160, 89, 0.2);
+        }
+
+        /* Light Leak Effect behind gates */
+        .light-leak {
+            position: absolute;
+            top: 0; left: 50%;
+            width: 2px;
+            height: 100%;
+            background: #c5a059;
+            box-shadow: 0 0 50px 20px rgba(197, 160, 89, 0.1);
+            transform: translateX(-50%);
+            z-index: 30;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+        .gate-open .light-leak { opacity: 0; } /* Fade out as doors open */
+
+        /* The Lock Mechanism */
+        .lock-container {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+            text-align: center;
+            transition: opacity 1s ease;
+        }
+        
+        .gate-open .lock-container {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Resonance Button */
+        .resonance-btn {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #1a1a1a 0%, #000 70%);
+            border: 1px solid #333;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+
+        .resonance-btn:active { transform: scale(0.95); }
+
+        .resonance-ring {
+            position: absolute;
+            inset: 0;
+            border: 2px solid #333;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .resonance-fill {
+            position: absolute;
+            inset: 0;
+            background: #c5a059;
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0);
+            transition: transform 0.1s linear, opacity 0.2s;
+        }
+
+        /* Holding State */
+        .holding .resonance-ring {
+            border-color: #c5a059;
+            box-shadow: 0 0 30px #c5a059;
+            animation: pulse-ring 0.5s infinite;
+        }
+        
+        .holding .resonance-fill {
+            opacity: 0.2;
+            transform: scale(var(--fill-scale));
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Vibration Text */
+        .vibrate { animation: shake 0.1s infinite; }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px); }
+            50% { transform: translate(-1px, -1px); }
+            100% { transform: translate(1px, 1px); }
+        }
+
+        /* Completion Content */
+        .completion-content {
+            opacity: 0;
+            transition: opacity 2s ease 2s; /* Delay for gate open */
+        }
+        .gate-open + .completion-content { opacity: 1; }
+
+    </style>
+</head>
+<body class="bg-void bg-noise flex items-center justify-center">
+
+    <div id="gate-container" class="">
+        <div class="gate-door gate-left">
+            <div class="gate-texture"></div>
+        </div>
+        <div class="gate-door gate-right">
+            <div class="gate-texture"></div>
+        </div>
+        <div class="light-leak"></div>
+    </div>
+
+    <div class="lock-container" id="lock-ui">
+        <div class="mb-8">
+            <h1 class="font-serif text-3xl text-paper tracking-widest mb-2">NEOPHYTE</h1>
+            <p class="font-mono text-xs text-gray-500 uppercase tracking-[0.5em]">0°=0° • Malkuth</p>
+        </div>
+
+        <button id="gate-btn" 
+            class="resonance-btn flex items-center justify-center group"
+            onmousedown="startHold()" 
+            onmouseup="endHold()" 
+            onmouseleave="endHold()"
+            ontouchstart="startHold()" 
+            ontouchend="endHold()"
+        >
+            <div class="resonance-fill" id="fill-anim"></div>
+            <div class="resonance-ring"></div>
+            
+            <div class="relative z-10 text-center">
+                <i class="fa-solid fa-fingerprint text-4xl text-gray-600 group-hover:text-gold transition-colors mb-2"></i>
+                <div class="font-sans text-[10px] text-gray-500 uppercase tracking-widest mt-2 group-hover:text-white">Hold to Sync</div>
+            </div>
+        </button>
+
+        <div class="mt-8 h-12">
+            <div id="status-msg" class="font-mono text-xs text-gray-600 uppercase tracking-widest">
+                System Standing By...
+            </div>
+        </div>
+    </div>
+
+    <main class="completion-content relative z-0 text-center max-w-2xl px-8">
+        
+        <div class="w-32 h-32 mx-auto mb-8 rounded-full border border-gold/30 bg-white/5 flex items-center justify-center shadow-[0_0_60px_rgba(197,160,89,0.15)] animate-fade-in-up">
+            <span class="font-serif text-5xl text-gold">10</span>
+        </div>
+
+        <h2 class="font-sans text-xs text-golddim tracking-[0.5em] uppercase mb-4">Configuration Saved</h2>
+        <h1 class="font-serif text-5xl md:text-6xl text-paper mb-8 leading-tight">
+            Initiation Complete
+        </h1>
+        
+        <div class="prose prose-invert prose-lg text-gray-400 mx-auto mb-12">
+            <p>
+                The Vessel is sealed. You have grounded the current of Malkuth. 
+                You are no longer a tourist in the Temple; you are an Operator.
+            </p>
+            <p>
+                The path now leads upward, to the Machinery of the Moon.
+            </p>
+        </div>
+
+        <div class="inline-block p-px bg-gradient-to-r from-transparent via-gold to-transparent w-full max-w-md mx-auto">
+            <div class="bg-black/80 backdrop-blur p-8 border border-white/5">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="font-serif text-xl text-paper">Next Grade: Zelator</span>
+                    <span class="font-mono text-xs text-gold border border-gold px-2 py-1">1°=10°</span>
+                </div>
+                <p class="text-xs text-gray-500 font-sans uppercase tracking-widest mb-6 text-left">
+                    Sphere: Yesod (The Foundation)<br>
+                    Task: Control of the Automatic Consciousness
+                </p>
+                <button class="w-full py-4 bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-[0.2em] uppercase hover:bg-gold hover:text-black hover:border-gold transition-all duration-300">
+                    Enter the Lunar Path
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        let holdTimer;
+        let progress = 0;
+        let isComplete = false;
+        
+        const btn = document.getElementById('gate-btn');
+        const fill = document.getElementById('fill-anim');
+        const statusMsg = document.getElementById('status-msg');
+        const gateContainer = document.getElementById('gate-container');
+        const lockUI = document.getElementById('lock-ui');
+
+        function startHold() {
+            if(isComplete) return;
+            
+            btn.classList.add('holding');
+            statusMsg.innerText = "Aligning Resonance...";
+            statusMsg.className = "font-mono text-xs text-gold uppercase tracking-widest vibrate";
+            
+            holdTimer = setInterval(() => {
+                progress += 1.5; // Speed
+                
+                // Visual Update
+                fill.style.setProperty('--fill-scale', progress / 50); // Grow fill
+                
+                // Random text glitch effect
+                if(Math.random() > 0.8) {
+                    statusMsg.innerText = `Syncing... ${Math.floor(progress)}%`;
+                }
+
+                if (progress >= 100) {
+                    completeInitiation();
+                }
+            }, 20);
+        }
+
+        function endHold() {
+            if(isComplete) return;
+            
+            clearInterval(holdTimer);
+            btn.classList.remove('holding');
+            
+            if(progress < 100) {
+                progress = 0;
+                fill.style.setProperty('--fill-scale', 0);
+                statusMsg.innerText = "Signal Lost. Will Broken.";
+                statusMsg.className = "font-mono text-xs text-lock uppercase tracking-widest";
+                
+                setTimeout(() => {
+                    statusMsg.innerText = "System Standing By...";
+                    statusMsg.className = "font-mono text-xs text-gray-600 uppercase tracking-widest";
+                }, 1500);
+            }
+        }
+
+        function completeInitiation() {
+            isComplete = true;
+            clearInterval(holdTimer);
+            
+            // UI Feedback
+            statusMsg.innerText = "ACCESS GRANTED";
+            statusMsg.classList.remove('vibrate');
+            
+            // 1. Open Gates
+            gateContainer.classList.add('gate-open');
+            
+            // 2. Hide Lock UI
+            lockUI.style.opacity = '0';
+            
+            // 3. Audio Cue (Simulated via text flash)
+            // (Handled by CSS transitions on the main content)
+        }

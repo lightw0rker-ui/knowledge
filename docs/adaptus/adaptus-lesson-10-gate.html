@@ -1,0 +1,483 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ADEPTUS // SYSTEM GATE — FIXED</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@300;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{--bg:#030304;--panel:#0a0a0f;--border:#2a2a35;--text:#a0a0b0;--gold:#c5a059;--success:#10b981;--error:#ef4444;--fire:#f59e0b;--water:#3b82f6;--air:#fcd34d;--earth:#10b981}
+    html,body{height:100%}
+    body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Arial;overflow:auto}
+    .glass{background:rgba(10,12,16,.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.06)}
+    .crt::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,.08) 50%), linear-gradient(90deg, rgba(255,0,0,.02), rgba(0,255,0,.01), rgba(0,0,255,.02));pointer-events:none}
+    .tarot-card{aspect-ratio:2/3.5;transition:all .3s}
+    .shake{transform:translateX(6px);transition:transform 80ms linear}
+    #console-output{font-family:"JetBrains Mono",monospace;font-size:11px;color:#c7c7d1;overflow:auto}
+    #stage-1,#stage-2,#stage-3,#stage-4{position:absolute;inset:0;top:3rem;display:flex;align-items:center;justify-content:center}
+    .hidden{display:none !important}
+  </style>
+</head>
+<body class="h-screen w-full flex flex-col selection:bg-gold selection:text-black">
+
+  <header class="h-14 border-b" style="border-color:var(--border);background:rgba(5,5,5,.9);display:flex;align-items:center;justify-content:space-between;padding:0 1rem;z-index:40">
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <i class="fa-solid fa-cube" style="color:var(--gold)"></i>
+      <div>
+        <div style="font-family:Cinzel,serif;color:#f3f3f3;letter-spacing:.12em">ADEPTUS <span style="color:var(--gold)">GATE</span></div>
+        <div style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text)">PROTOCOL: 32_PATH_VALIDATION</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem">
+      <div style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text)">SYSTEM INTEGRITY: <span style="color:var(--success)">98.4%</span></div>
+      <div style="background:var(--panel);border:1px solid var(--border);padding:.25rem .5rem;font-family:JetBrains Mono,monospace;color:var(--gold)">ID: ALPHA-2-0</div>
+    </div>
+  </header>
+
+  <main class="flex-grow relative p-6" style="display:flex;gap:1rem">
+    <aside style="width:20rem;display:flex;flex-direction:column;gap:.75rem;z-index:30">
+      <div class="glass" style="padding:.5rem;border-radius:.25rem">
+        <div style="background:rgba(0,0,0,.45);padding:.6rem;border-radius:.25rem;border:1px solid rgba(255,255,255,.03)">
+          <div style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--gold);margin-bottom:.5rem;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:.4rem">OPERATIONAL CONSTANTS</div>
+          <div style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text);display:flex;flex-direction:column;gap:.35rem">
+            <div style="display:flex;justify-content:space-between"><span>Plane:</span><span style="color:#fff">YETZIRAH</span></div>
+            <div style="display:flex;justify-content:space-between"><span>Mode:</span><span style="color:#fff">ACTIVE</span></div>
+            <div style="display:flex;justify-content:space-between"><span>Sephira:</span><span style="color:#c084fc">YESOD</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass crt" style="flex:1;position:relative;border-radius:.25rem;overflow:hidden">
+        <div style="padding:.5rem;border-bottom:1px solid rgba(255,255,255,.05);background:var(--panel);display:flex;justify-content:space-between;align-items:center">
+          <div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--gold)"><i class="fa-solid fa-terminal" style="margin-right:.4rem"></i>EVENT LOG</div>
+          <div style="width:.5rem;height:.5rem;border-radius:50%;background:var(--success);animation: pulse 1.6s infinite"></div>
+        </div>
+        <div id="console-output" style="padding:.75rem;height:14rem;overflow:auto"></div>
+      </div>
+    </aside>
+
+    <section class="glass" style="flex:1;border-radius:.25rem;position:relative;overflow:hidden;padding:0">
+      <div style="height:3rem;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;background:rgba(10,10,12,.6)">
+        <div style="width:100%;max-width:56rem;display:flex;gap:.5rem">
+          <div id="p-step-1" style="height:.5rem;flex:1;background:var(--gold);border-radius:.25rem;box-shadow:0 0 10px rgba(197,160,89,.4)"></div>
+          <div id="p-step-2" style="height:.5rem;flex:1;background:var(--border);border-radius:.25rem"></div>
+          <div id="p-step-3" style="height:.5rem;flex:1;background:var(--border);border-radius:.25rem"></div>
+          <div id="p-step-4" style="height:.5rem;flex:1;background:var(--border);border-radius:.25rem"></div>
+        </div>
+      </div>
+
+      <!-- STAGE CONTAINERS -->
+      <div id="stage-1" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem">
+        <div style="text-align:center;margin-bottom:1.5rem">
+          <h2 style="font-family:Cinzel,serif;font-size:2rem;color:#fff;margin:0">MALKUTH</h2>
+          <div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--gold)">PROTOCOL I: ESTABLISH THE KINGDOM</div>
+        </div>
+
+        <div style="position:relative;width:16rem;height:16rem;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center">
+          <div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,255,255,.04);animation:spin 12s linear infinite"></div>
+
+          <div style="position:absolute;top:.5rem;left:50%;transform:translateX(-50%);">
+            <button id="btn-fire" type="button" class="element-btn" style="width:3rem;height:3rem;border:1px solid var(--border);background:var(--panel);border-radius:8px;color:var(--text)"><i class="fa-solid fa-fire"></i></button>
+          </div>
+          <div style="position:absolute;right:.5rem;top:50%;transform:translateY(-50%)">
+            <button id="btn-water" type="button" class="element-btn" style="width:3rem;height:3rem;border:1px solid var(--border);background:var(--panel);border-radius:8px;color:var(--text)"><i class="fa-solid fa-droplet"></i></button>
+          </div>
+          <div style="position:absolute;left:.5rem;top:50%;transform:translateY(-50%)">
+            <button id="btn-air" type="button" class="element-btn" style="width:3rem;height:3rem;border:1px solid var(--border);background:var(--panel);border-radius:8px;color:var(--text)"><i class="fa-solid fa-wind"></i></button>
+          </div>
+          <div style="position:absolute;bottom:.5rem;left:50%;transform:translateX(-50%)">
+            <button id="btn-earth" type="button" class="element-btn" style="width:3rem;height:3rem;border:1px solid var(--border);background:var(--panel);border-radius:8px;color:var(--text)"><i class="fa-solid fa-leaf"></i></button>
+          </div>
+
+          <div id="center-seal" style="width:8rem;height:8rem;border:1px dashed rgba(255,255,255,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:.35">
+            <div style="font-family:Cinzel,serif;color:#fff">EARTH</div>
+          </div>
+        </div>
+        <div style="margin-top:1rem;font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text)">ACTIVATE QUADRANTS TO PROCEED</div>
+      </div>
+
+      <div id="stage-2" class="hidden" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem">
+        <div style="text-align:center;margin-bottom:1rem">
+          <h2 style="font-family:Cinzel,serif;font-size:2rem;color:#fff;margin:0">SIGNIFICATOR</h2>
+          <div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--gold)">PROTOCOL II: IDENTIFY THE AGENT (Fire of Water)</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+          <div class="tarot-card" style="background:var(--panel);border:1px solid var(--border);padding:1rem;cursor:pointer" data-action="fail" data-msg="Incorrect. The Knight is Fire of Fire (Rash Force).">
+            <div style="text-align:right;font-family:Cinzel,serif;color:var(--fire)">Kn.</div>
+            <div style="text-align:center"><i class="fa-solid fa-fire" style="font-size:1.5rem;color:var(--fire)"></i><div style="font-family:Cinzel,serif;color:var(--text)">KNIGHT WANDS</div></div>
+            <div style="text-align:center;font-family:JetBrains Mono,monospace;font-size:9px;color:var(--text);border-top:1px solid rgba(255,255,255,.06);padding-top:.4rem">FIRE OF FIRE</div>
+          </div>
+
+          <div class="tarot-card" style="background:var(--panel);border:1px solid var(--border);padding:1rem;cursor:pointer" data-action="advance" data-target="3">
+            <div style="text-align:right;font-family:Cinzel,serif;color:var(--gold)">Qn.</div>
+            <div style="text-align:center;position:relative"><i class="fa-solid fa-fire" style="font-size:1.5rem;color:var(--fire)"></i><i class="fa-solid fa-droplet" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);opacity:.6;color:var(--water)"></i><div style="font-family:Cinzel,serif;color:var(--gold)">QUEEN WANDS</div></div>
+            <div style="text-align:center;font-family:JetBrains Mono,monospace;font-size:9px;color:var(--text);border-top:1px solid rgba(255,255,255,.06);padding-top:.4rem">WATERY PART OF FIRE</div>
+          </div>
+
+          <div class="tarot-card" style="background:var(--panel);border:1px solid var(--border);padding:1rem;cursor:pointer" data-action="fail" data-msg="Incorrect. The Princess is Earth of Fire (Fuel).">
+            <div style="text-align:right;font-family:Cinzel,serif;color:var(--earth)">Pr.</div>
+            <div style="text-align:center"><i class="fa-solid fa-fire" style="font-size:1.5rem;color:var(--fire)"></i><div style="font-family:Cinzel,serif;color:var(--text)">PRINCESS WANDS</div></div>
+            <div style="text-align:center;font-family:JetBrains Mono,monospace;font-size:9px;color:var(--text);border-top:1px solid rgba(255,255,255,.06);padding-top:.4rem">EARTH OF FIRE</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="stage-3" class="hidden" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem">
+        <div style="text-align:center;margin-bottom:1rem">
+          <h2 style="font-family:Cinzel,serif;font-size:2rem;color:#fff;margin:0">PATH VECTOR</h2>
+          <div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--gold)">PROTOCOL III: COUNTING THE KEYS</div>
+        </div>
+
+        <div style="background:var(--panel);border:1px solid var(--border);padding:2rem;border-radius:.4rem;display:flex;flex-direction:column;align-items:center">
+          <p style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--text);text-align:center;max-width:36rem;margin:0 0 1rem 0"><strong style="color:var(--gold)">INSTRUCTION:</strong> From the Queen (4), project the Ray to find the Hidden Link.<br>Count: Current (1) → 2 → 3 → Target (4).</p>
+
+          <div style="display:flex;align-items:center;gap:1rem">
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <div style="width:5rem;height:7.5rem;border:1px solid var(--gold);background:rgba(197,160,89,.07);display:flex;align-items:center;justify-content:center">QUEEN</div>
+              <div style="font-family:JetBrains Mono,monospace;color:var(--text);font-size:11px">1</div>
+            </div>
+            <div style="width:2rem;height:1px;background:var(--border)"></div>
+            <div style="width:2rem;height:4.5rem;border:1px dashed var(--border);opacity:.5"></div>
+            <div style="width:2rem;height:1px;background:var(--border)"></div>
+            <div style="width:2rem;height:4.5rem;border:1px dashed var(--border);opacity:.5"></div>
+            <div style="width:2rem;height:1px;background:var(--border)"></div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <div id="target-slot" style="width:5rem;height:7.5rem;border:1px solid rgba(255,255,255,.18);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer">CLICK TO PROJECT</div>
+              <div style="font-family:JetBrains Mono,monospace;color:var(--gold);font-size:11px">4</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+  id="stage-4"
+  class="hidden"
+  style="
+    position:absolute;
+    inset:0;
+    display:none;               /* ✅ do NOT use display:flex while 'hidden' */
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:2rem;
+    z-index:55;                 /* ✅ higher than other stages */
+    pointer-events:auto;        /* ✅ ensure it can receive clicks */
+  "
+>
+  <div style="text-align:center;margin-bottom:1rem">
+    <h2 style="font-family:Cinzel,serif;font-size:2rem;color:#fff;margin:0">FINAL ORDEAL</h2>
+    <div style="font-family:JetBrains Mono,monospace;font-size:11px;color:#ff6b6b">ALERT: BINARY DISSONANCE DETECTED</div>
+  </div>
+
+  <div style="display:flex;gap:2rem;align-items:center;justify-content:center;margin-bottom:1rem">
+    <div style="width:10rem;height:16rem;background:var(--panel);border:1px solid var(--gold);padding:1rem;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative">
+      <div style="position:absolute;top:1rem;right:1rem;color:var(--gold);font-family:Cinzel,serif">I</div>
+      <div style="font-size:2.5rem;color:var(--gold)"><i class="fa-solid fa-hand-holding-magic"></i></div>
+      <div style="font-family:Cinzel,serif;color:#fff">THE MAGICIAN</div>
+      <div style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text)">WILL / MERCURY</div>
+    </div>
+
+    <div style="font-family:Cinzel,serif;font-size:1.5rem;color:var(--text);font-style:italic">VS</div>
+
+    <div style="width:10rem;height:16rem;background:var(--panel);border:1px solid rgba(255,255,255,.08);padding:1rem;display:flex;flex-direction:column;align-items:center;justify-content:center;filter:grayscale(1);position:relative">
+      <div style="position:absolute;top:1rem;right:1rem;color:var(--text);font-family:Cinzel,serif">X</div>
+      <div style="font-size:2.5rem;color:var(--text)"><i class="fa-solid fa-skull-crossbones"></i></div>
+      <div style="font-family:Cinzel,serif;color:var(--text)">10 SWORDS</div>
+      <div style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text)">RUIN / SUN IN GEMINI</div>
+    </div>
+  </div>
+
+  <div style="width:100%;max-width:28rem;display:grid;gap:.5rem">
+    <button
+      type="button"
+      class="option-btn"
+      data-action="fail"
+      data-failure="Incorrect. Force cannot simply erase Consequence."
+      style="padding:1rem;border:1px solid var(--border);background:var(--panel);text-align:left;font-family:JetBrains Mono,monospace;cursor:pointer;pointer-events:auto"
+    >
+      <strong style="color:#ff6b6b;display:block;margin-bottom:.4rem">OPTION A:</strong>
+      The Magician exerts Will to shatter the Swords. (Martial Solution)
+    </button>
+
+    <button
+      type="button"
+      class="option-btn"
+      data-action="fail"
+      data-failure="Incorrect. Passivity ensures destruction."
+      style="padding:1rem;border:1px solid var(--border);background:var(--panel);text-align:left;font-family:JetBrains Mono,monospace;cursor:pointer;pointer-events:auto"
+    >
+      <strong style="color:#ff6b6b;display:block;margin-bottom:.4rem">OPTION B:</strong>
+      The Ruin is inevitable. Accept the failure of the Intellect. (Fatalism)
+    </button>
+
+    <!-- ✅ Option C exists + routed to finishExam -->
+    <button
+      type="button"
+      id="option-c"
+      data-action="finish"
+      style="padding:1rem;border:1px solid var(--border);background:var(--panel);text-align:left;font-family:JetBrains Mono,monospace;cursor:pointer;pointer-events:auto"
+    >
+      <strong style="color:var(--gold);display:block;margin-bottom:.4rem">OPTION C:</strong>
+      The Magician provides the Path (Beth) for the Ruined Intellect to reconnect to Spirit. Transmutation, not battle.
+    </button>
+  </div>
+</div>
+
+<div
+  id="success-screen"
+  class="hidden"
+  style="
+    position:absolute;
+    inset:0;
+    display:none;               /* ✅ do NOT use display:flex while 'hidden' */
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.85);
+    z-index:90;
+    pointer-events:auto
+  "
+>
+  <div style="width:6rem;height:6rem;border-radius:50%;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;margin-bottom:.75rem">
+    <i class="fa-solid fa-eye" style="font-size:2rem;color:var(--gold)"></i>
+  </div>
+  <h1 style="font-family:Cinzel,serif;color:#fff">GATE OPEN</h1>
+  <div style="font-family:JetBrains Mono,monospace;color:var(--gold);margin-bottom:.75rem">ADEPTUS MINOR GRADE CONFIRMED</div>
+  <div style="font-family:JetBrains Mono,monospace;color:var(--text);background:var(--panel);padding:.5rem;border:1px solid var(--border)">
+    HASH: 0x99_KNOWLEDGE_CONVERSATION_COMPLETE
+  </div>
+</div>
+
+</section>
+</main>
+
+<script type="text/javascript">
+  // Robust stage & widget logic (FIXED)
+  (function(){
+    const terminal = document.getElementById('console-output');
+    const stages = {
+      1: document.getElementById('stage-1'),
+      2: document.getElementById('stage-2'),
+      3: document.getElementById('stage-3'),
+      4: document.getElementById('stage-4')
+    };
+    const successScreen = document.getElementById('success-screen');
+
+    // ✅ start at 0 so showStage(1) actually runs
+    const state = { elements:{fire:false,water:false,air:false,earth:false}, current:0, failCooldown:false };
+
+    function log(msg, type='info'){
+      if(!terminal){ console[type==='error'?'error':'log'](msg); return; }
+      const d = document.createElement('div');
+      const ts = new Date().toLocaleTimeString('en-US',{hour12:false});
+      d.innerHTML = `<span style="opacity:.6">[${ts}]</span> ${msg}`;
+      d.style.color = type==='error' ? 'var(--error)' : type==='success' ? 'var(--success)' : type==='system' ? 'var(--gold)' : 'var(--text)';
+      terminal.appendChild(d);
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function updateProgress(n){
+      for(let i=1;i<=4;i++){
+        const el = document.getElementById('p-step-'+i);
+        if(!el) continue;
+        el.style.background = (i<=n) ? 'var(--gold)' : 'var(--border)';
+      }
+    }
+
+    // ✅ unified visibility control (class + inline display)
+    function setVisible(el, yes, displayMode='flex'){
+      if(!el) return;
+      if(yes){
+        el.classList.remove('hidden');
+        el.style.display = displayMode;
+        el.style.pointerEvents = 'auto';
+      }else{
+        el.classList.add('hidden');
+        el.style.display = 'none';
+        el.style.pointerEvents = 'none';
+      }
+    }
+
+    function enableStage4Buttons(){
+      const s4 = stages[4];
+      if(!s4) return;
+      s4.style.zIndex = '55';
+      s4.style.pointerEvents = 'auto';
+      s4.querySelectorAll('button').forEach(b=>{
+        b.disabled = false;
+        b.style.opacity = 1;
+        b.style.cursor = 'pointer';
+        b.style.pointerEvents = 'auto';
+        b.setAttribute('type','button');
+      });
+
+      // ✅ guarantee option-c exists
+      if(!document.getElementById('option-c')){
+        const wrap = s4.querySelector('div[style*="max-width:28rem"]');
+        if(wrap){
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.id = 'option-c';
+          btn.setAttribute('data-action','finish');
+          btn.style.cssText = "padding:1rem;border:1px solid var(--border);background:var(--panel);text-align:left;font-family:JetBrains Mono,monospace;cursor:pointer;pointer-events:auto";
+          btn.innerHTML = "<strong style='color:var(--gold);display:block;margin-bottom:.4rem'>OPTION C:</strong>The Magician provides the Path (Beth) for the Ruined Intellect to reconnect to Spirit. Transmutation, not battle.";
+          wrap.appendChild(btn);
+        }
+      }
+    }
+
+    function showStage(n){
+      // hide old
+      if(state.current && stages[state.current]) setVisible(stages[state.current], false);
+      // show new
+      const nw = stages[n];
+      if(nw){
+        // stage-4 is flex layout; others may be flex too, but keep default
+        setVisible(nw, true, (n===4 ? 'flex' : (nw.style.display || 'block')));
+        // keep stage 4 on top
+        if(n===4) enableStage4Buttons();
+      }
+      state.current = n;
+      updateProgress(n);
+      log(`ENTERING PROTOCOL ${n}...`, 'system');
+    }
+
+    function activateElement(name){
+      if(!(name in state.elements)) return;
+      if(state.elements[name]) return;
+      state.elements[name]=true;
+      const btn = document.getElementById('btn-'+name);
+      if(btn){ btn.style.background='#fff'; btn.style.color='#000'; btn.style.borderColor='#fff'; }
+      log(`ELEMENT ACTIVE: ${name.toUpperCase()}`, 'info');
+      if(Object.values(state.elements).every(Boolean)){
+        const center = document.getElementById('center-seal');
+        if(center){ center.style.opacity=1; center.innerHTML='<strong style="color:var(--gold);font-family:Cinzel,serif">OPEN</strong>'; }
+        log('MALKUTH GROUNDED. INITIATING ASCENT.', 'success');
+        setTimeout(()=>showStage(2),900);
+      }
+    }
+
+    function advanceTo(n){
+      log(`PROTOCOL ${state.current} VERIFIED.`, 'success');
+      showStage(n);
+    }
+
+    function fail(reason){
+      if(state.failCooldown) return;
+      state.failCooldown = true;
+      setTimeout(()=>state.failCooldown=false,600);
+      log('ERROR: '+reason,'error');
+      const st = stages[state.current];
+      if(st){ st.classList.add('shake'); setTimeout(()=>st.classList.remove('shake'),220); }
+    }
+
+    function finish(){
+      // disable options
+      const s4 = stages[4];
+      if(s4){
+        s4.querySelectorAll('.option-btn, #option-c, button').forEach(b=>{
+          b.disabled=true; b.style.opacity=.5; b.style.cursor='not-allowed'; b.style.pointerEvents='none';
+        });
+      }
+      log('SYNTHESIS ACHIEVED.','success');
+      log('DEPLOYING FINAL HASH...','system');
+      const s4p = document.getElementById('p-step-4');
+      if(s4p) s4p.style.background='var(--gold)';
+      setTimeout(()=>{
+        if(successScreen){
+          setVisible(successScreen, true, 'flex');
+          successScreen.style.zIndex = '90';
+        }
+      },800);
+    }
+
+    // attach element buttons
+    ['fire','water','air','earth'].forEach(k=>{
+      const b = document.getElementById('btn-'+k);
+      if(b) b.addEventListener('click', ()=>activateElement(k));
+    });
+
+    // stage 2 cards (data-action handlers)
+    document.querySelectorAll('#stage-2 .tarot-card').forEach(card=>{
+      const action = card.dataset.action;
+      if(action==='fail'){
+        const msg = card.dataset.msg || 'Incorrect.';
+        card.addEventListener('click', ()=>fail(msg));
+      } else if(action==='advance'){
+        const target = Number(card.dataset.target) || 3;
+        card.addEventListener('click', ()=>advanceTo(target));
+      }
+    });
+
+    // target slot in stage-3
+    const targetSlot = document.getElementById('target-slot');
+    if(targetSlot) targetSlot.addEventListener('click', ()=>advanceTo(4));
+
+    // ✅ Stage-4 direct bindings (and stop propagation to avoid double-fire)
+    function bindStage4Direct(){
+      const s4 = stages[4];
+      if(!s4) return;
+
+      s4.querySelectorAll('.option-btn[data-action="fail"]').forEach(b=>{
+        b.addEventListener('click', (e)=>{
+          e.preventDefault(); e.stopPropagation();
+          if(b.disabled) return;
+          fail(b.dataset.failure || 'Incorrect choice.');
+        });
+      });
+
+      const oc = document.getElementById('option-c');
+      if(oc){
+        oc.addEventListener('click', (e)=>{
+          e.preventDefault(); e.stopPropagation();
+          if(oc.disabled) return;
+          finish();
+        });
+      }
+    }
+
+    // ✅ Delegation fallback (covers dynamic replacements) — no capture, no double-fire
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('#stage-4 button');
+      if(!btn) return;
+      if(btn.disabled) return;
+
+      const action = btn.getAttribute('data-action');
+      if(action === 'finish' || btn.id === 'option-c'){
+        finish();
+      } else if(btn.classList.contains('option-btn')){
+        fail(btn.getAttribute('data-failure') || 'Incorrect choice.');
+      }
+    });
+
+    // expose functions used elsewhere if needed
+    window.activateElement = activateElement;
+    window.advanceStage = advanceTo;
+    window.failLog = fail;
+    window.finishExam = finish;
+    window.showStage = showStage;
+
+    // initialize
+    log('SYSTEM READY.','system');
+    showStage(1);
+
+    // whenever stage 4 is shown, ensure buttons are enabled & handlers exist
+    const s4 = stages[4];
+    if(s4){
+      const mo = new MutationObserver(()=> {
+        const visible = s4.style.display !== 'none' && !s4.classList.contains('hidden');
+        if(visible){
+          enableStage4Buttons();
+          bindStage4Direct();
+        }
+      });
+      mo.observe(s4, { attributes:true, attributeFilter:['class','style'] });
+    }
+  })();
+</script>
+</body>
+</html>
