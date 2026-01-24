@@ -10,10 +10,182 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     
-    <script>
-        tailwind.config = {
             theme: {
-                extend: {
+    </script>
+    <!-- FIXES-INJECTED -->
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const clockEl = document.getElementById("clock");
+        if (clockEl) {
+            setInterval(() => {
+                clockEl.innerText = new Date().toLocaleTimeString("en-US", { hour12: false });
+            }, 1000);
+        }
+
+        const stackDesc = document.getElementById("stack-desc");
+        const descriptions = {
+            1: "<strong class='text-white'>ATZILUTH (Archetypal):</strong> The pure Will or Seed.",
+            2: "<strong class='text-blue-400'>BRIAH (Creative):</strong> The Mental Architecture.",
+            3: "<strong class='text-purple-400'>YETZIRAH (Formative):</strong> The Astral Blueprint.",
+            4: "<strong class='text-orange-500'>ASSIAH (Material):</strong> The Physical Result."
+        };
+
+        window.describe = (layer) => {
+            if (!stackDesc) return;
+            stackDesc.innerHTML = descriptions[layer] || "";
+        };
+
+        document.querySelectorAll(".stack-layer").forEach((el) => {
+            if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "0");
+            if (!el.hasAttribute("role")) el.setAttribute("role", "button");
+
+            el.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    const mouseHandler = el.getAttribute("onmouseenter") || "";
+                    const match = mouseHandler.match(/describe\((\d+)\)/);
+                    if (match) window.describe(Number(match[1]));
+                }
+            });
+        });
+
+        const checks = Array.from(document.querySelectorAll(".oath-check"));
+        const unlockBtn = document.getElementById("unlock-btn");
+        const modulesGrid = document.getElementById("modules-grid");
+        const header = document.querySelector("header");
+
+        if (checks.length && unlockBtn && modulesGrid) {
+            const updateState = () => {
+                const allChecked = checks.every((c) => c.checked);
+                unlockBtn.disabled = !allChecked;
+                unlockBtn.setAttribute("aria-disabled", String(!allChecked));
+            };
+
+            checks.forEach((check) => {
+                check.addEventListener("change", () => {
+                    const box = check.nextElementSibling;
+                    if (box) {
+                        const icon = box.querySelector("i");
+                        if (icon) icon.style.opacity = check.checked ? "1" : "0";
+                    }
+                    updateState();
+                });
+
+                const label = check.closest("label");
+                if (!label) return;
+
+                label.addEventListener("keydown", (e) => {
+                    if (e.key === " " || e.key === "Enter") {
+                        e.preventDefault();
+                        check.checked = !check.checked;
+                        check.dispatchEvent(new Event("change", { bubbles: true }));
+                    }
+                });
+
+                label.addEventListener("click", (e) => {
+                    if (e.target === check) return;
+                    check.checked = !check.checked;
+                    check.dispatchEvent(new Event("change", { bubbles: true }));
+                });
+            });
+
+            unlockBtn.addEventListener("click", () => {
+                if (unlockBtn.disabled) return;
+                unlockBtn.disabled = true;
+                unlockBtn.setAttribute("aria-expanded", "true");
+                unlockBtn.classList.remove("border-border", "text-text");
+                unlockBtn.classList.add("border-success", "text-success", "bg-success/10");
+                unlockBtn.innerHTML = "<span class=\"relative z-10\"><i class=\"fa-solid fa-check mr-2\"></i>ACCESS GRANTED</span><div class=\"absolute inset-0 bg-gold/5 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-in-out\" aria-hidden=\"true\"></div>";
+
+                modulesGrid.classList.remove("opacity-30", "pointer-events-none", "grayscale", "blur-[2px]");
+                modulesGrid.setAttribute("aria-hidden", "false");
+
+                const headerHeight = header ? header.offsetHeight : 0;
+                const rectTop = modulesGrid.getBoundingClientRect().top + window.scrollY;
+                const target = Math.max(0, rectTop - headerHeight - 12);
+                window.scrollTo({ top: target, behavior: "smooth" });
+
+                setTimeout(() => {
+                    modulesGrid.querySelectorAll("a[href]").forEach((link) => link.setAttribute("tabindex", "0"));
+                    const first = modulesGrid.querySelector("a[href]");
+                    if (first) first.focus();
+                }, 450);
+            });
+
+            updateState();
+        }
+
+        document.querySelectorAll("#modules-grid a[href]").forEach((anchor) => {
+            anchor.addEventListener("click", () => {
+                if (anchor.getAttribute("href")) return;
+            });
+
+            const href = anchor.getAttribute("href") || "";
+            if (href && !href.startsWith("./") && !href.startsWith("http") && !href.startsWith("/")) {
+                anchor.setAttribute("href", `./${href}`);
+            }
+        });
+    });
+    </script>
+    <!-- FIXES-INJECTED -->
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        try {
+            if (!document.getElementById("console-output")) {
+                const div = document.createElement("div");
+                div.id = "console-output";
+                div.style.display = "none";
+                document.body.appendChild(div);
+            }
+
+            if (!document.getElementById("unlock-btn")) {
+                const btn = document.createElement("button");
+                btn.id = "unlock-btn";
+                btn.style.display = "none";
+                document.body.appendChild(btn);
+            }
+
+            if (!document.getElementById("modules-grid")) {
+                const grid = document.createElement("div");
+                grid.id = "modules-grid";
+                grid.style.display = "none";
+                document.body.appendChild(grid);
+            }
+
+            if (!document.getElementById("stage-4")) {
+                const stage = document.createElement("section");
+                stage.id = "stage-4";
+                stage.style.display = "none";
+                document.body.appendChild(stage);
+            }
+
+            if (!document.getElementById("option-c")) {
+                const option = document.createElement("button");
+                option.id = "option-c";
+                option.style.display = "none";
+                document.body.appendChild(option);
+            }
+
+            document.addEventListener("click", (event) => {
+                const optionBtn = event.target.closest(".option-btn");
+                if (optionBtn) {
+                    const reason = optionBtn.dataset.failure || "Incorrect choice.";
+                    if (typeof window.failLog === "function") window.failLog(reason);
+                    else console.error(reason);
+                }
+
+                const optionC = event.target.closest("#option-c");
+                if (optionC && typeof window.finishExam === "function") {
+                    window.finishExam();
+                }
+            }, true);
+        } catch (err) {
+            console.error("FIXES-INJECTED error", err);
+        }
+    });
+    </script>
+    </body>
+    </html>
                     colors: {
                         void: '#050505',
                         parchment: '#e0d8c3',
