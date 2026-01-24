@@ -9,7 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
-            tailwind.config = {
+    <script>
+        tailwind.config = {
             theme: {
                 extend: {
                     colors: {
@@ -28,11 +29,11 @@
                         mono: ['"JetBrains Mono"', 'monospace'],
                     },
                     backgroundImage: {
-                        'noise': "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.07%22/%3E%3C/svg%3E')",
+                        noise: "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.07%22/%3E%3C/svg%3E')",
                     }
                 }
             }
-        }
+        };
     </script>
     <style>
         /* Base */
@@ -44,6 +45,13 @@
             overflow: hidden; /* Lock scroll for initiation */
         }
         *, *:before, *:after { box-sizing: inherit; }
+
+        html.gate-open,
+        body.gate-open {
+            overflow: auto;
+            height: auto;
+            min-height: 100%;
+        }
 
         /* The Great Gates */
         .gate-door {
@@ -107,6 +115,10 @@
             transition: opacity 2s ease;
         }
         .gate-open .light-leak { opacity: 0; } /* Fade out as doors open */
+
+        #gate-container.gate-open {
+            pointer-events: none;
+        }
 
         /* The Lock Mechanism */
         .lock-container {
@@ -265,9 +277,9 @@
                     Sphere: Yesod (The Foundation)<br>
                     Task: Control of the Automatic Consciousness
                 </p>
-                <button class="w-full py-4 bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-[0.2em] uppercase hover:bg-gold hover:text-black hover:border-gold transition-all duration-300">
+                <a href="../zelator/zelator-intro.html" class="w-full inline-block text-center py-4 bg-white/5 border border-white/10 text-gray-400 text-xs font-bold tracking-[0.2em] uppercase hover:bg-gold hover:text-black hover:border-gold transition-all duration-300">
                     Enter the Lunar Path
-                </button>
+                </a>
             </div>
         </div>
 
@@ -287,6 +299,7 @@
         function startHold() {
             if(isComplete) return;
             
+            clearInterval(holdTimer);
             btn.classList.add('holding');
             statusMsg.innerText = "Aligning Resonance...";
             statusMsg.className = "font-mono text-xs text-gold uppercase tracking-widest vibrate";
@@ -330,6 +343,7 @@
         function completeInitiation() {
             isComplete = true;
             clearInterval(holdTimer);
+            progress = 100;
             
             // UI Feedback
             statusMsg.innerText = "ACCESS GRANTED";
@@ -340,7 +354,46 @@
             
             // 2. Hide Lock UI
             lockUI.style.opacity = '0';
-            
+
             // 3. Audio Cue (Simulated via text flash)
             // (Handled by CSS transitions on the main content)
-        }
+
+            // 4. Finalize UI state
+            try {
+                // Apply gate-open to body and html so overflow unlocks cleanly
+                document.body.classList.add('gate-open');
+                document.documentElement.classList.add('gate-open');
+                document.body.style.overflow = 'auto';
+                document.documentElement.style.overflow = 'auto';
+
+                // Fully reveal the completion content if present
+                const completionMain = document.querySelector('main.completion-content');
+                if (completionMain) {
+                    completionMain.style.opacity = '1';
+                }
+
+                // Disable interactions on the button
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.remove('holding');
+                }
+
+                if (fill) {
+                    fill.style.setProperty('--fill-scale', 1);
+                }
+
+                if (lockUI) {
+                    lockUI.style.pointerEvents = 'none';
+                    lockUI.style.display = 'none';
+                }
+
+                if (gateContainer) {
+                    gateContainer.style.pointerEvents = 'none';
+                }
+            } catch (e) {
+                console.error('Gate completion error', e);
+            }
+            }
+        </script>
+    </body>
+    </html>
