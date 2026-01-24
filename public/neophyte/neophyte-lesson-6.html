@@ -1,0 +1,434 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EsoTarot | Lesson VI: Idolatry of Keywords</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#050505',
+                        paper: '#e0d8c3',
+                        gold: '#c5a059',
+                        golddim: '#8a6e36',
+                        stone: '#2a2a2a',   // Dead Keyword
+                        crimson: '#8a1c1c', // Destruction/Action
+                        truth: '#E4D00A',   // Revealed Light
+                    },
+                    fontFamily: {
+                        serif: ['"Cinzel"', 'serif'],
+                        body: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'noise': "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.07%22/%3E%3C/svg%3E')",
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Base */
+        html, body {
+            box-sizing: border-box;
+            background-color: #050505;
+            color: #e0d8c3;
+            height: 100%;
+        }
+        *, *:before, *:after { box-sizing: inherit; }
+
+        /* Sidebar State */
+        .sidebar-link {
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+            opacity: 0.7;
+        }
+        .sidebar-link:hover {
+            opacity: 1;
+            padding-left: 1.75rem;
+            color: #c5a059;
+            border-left-color: #c5a059;
+        }
+        .sidebar-link.active {
+            opacity: 1;
+            color: #e0d8c3;
+            border-left-color: #c5a059;
+            background: linear-gradient(90deg, rgba(197, 160, 89, 0.1) 0%, transparent 100%);
+        }
+
+        /* The Stone Slab (Idol) */
+        .stone-slab {
+            background: #1a1a1a;
+            border: 4px solid #333;
+            color: #666;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        
+        .stone-slab:hover {
+            border-color: #8a1c1c;
+            color: #888;
+        }
+
+        .crack {
+            position: absolute;
+            background: #000;
+            width: 2px;
+            height: 0%;
+            top: 0;
+            left: 50%;
+            transition: height 0.2s ease-out;
+            z-index: 10;
+        }
+
+        /* Shattered State */
+        .stone-slab.shattered {
+            background: transparent;
+            border-color: transparent;
+            pointer-events: none;
+        }
+        
+        .stone-slab.shattered .slab-content {
+            opacity: 0;
+            transform: scale(1.5);
+            filter: blur(10px);
+            transition: all 0.5s ease-out;
+        }
+
+        /* Shards Animation */
+        .shard {
+            position: absolute;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            width: 50%;
+            height: 50%;
+            top: 0; left: 0;
+            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+            opacity: 1;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .shattered .shard-tl { transform: translate(-50px, -50px) rotate(-20deg); opacity: 0; }
+        .shattered .shard-tr { transform: translate(50px, -50px) rotate(20deg); opacity: 0; }
+        .shattered .shard-bl { transform: translate(-50px, 50px) rotate(10deg); opacity: 0; }
+        .shattered .shard-br { transform: translate(50px, 50px) rotate(-10deg); opacity: 0; }
+
+        /* The Revealed Truth */
+        .truth-layer {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 1s ease 0.3s; /* Delay until shatter starts */
+            z-index: 0;
+        }
+
+        .shattered + .truth-layer {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Glitch Text for Keywords */
+        .glitch-text:hover {
+            animation: glitch 0.3s infinite;
+        }
+        
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+
+    </style>
+</head>
+<body class="bg-void bg-noise min-h-screen flex overflow-x-hidden">
+
+    <aside id="sidebar" class="w-64 border-r border-white/10 flex-col z-50 bg-void/95 backdrop-blur-xl h-full md:h-screen md:flex
+                   fixed left-0 top-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+        <div class="p-8 border-b border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-6 h-6 border border-gold rotate-45 flex items-center justify-center">
+                    <div class="w-3 h-3 bg-gold/80 rotate-45"></div>
+                </div>
+                <span class="font-serif text-lg tracking-widest text-gold">ESOTAROT</span>
+            </div>
+            <div class="mt-6 text-[10px] font-sans text-gray-500 uppercase tracking-widest flex justify-between">
+                <span>Current Station</span>
+                <span class="text-gold">Malkuth</span>
+            </div>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-8">
+            <div class="px-6 mb-4 text-xs font-sans text-golddim uppercase tracking-widest">Neophyte Curriculum</div>
+            
+            <a href="neophyte-lesson-3.html" class="sidebar-link block px-6 py-3 font-sans text-sm tracking-wide text-gray-400">
+                3. Body-as-Temple
+            </a>
+            <a href="neophyte-lesson-4.html" class="sidebar-link block px-6 py-3 font-sans text-sm tracking-wide text-gray-400">
+                4. Banishment (LBRP)
+            </a>
+            <a href="neophyte-lesson-5.html" class="sidebar-link block px-6 py-3 font-sans text-sm tracking-wide text-gray-400">
+                5. The Four Worlds
+            </a>
+            <a href="neophyte-lesson-6.html" class="sidebar-link active block px-6 py-3 font-sans text-sm tracking-wide">
+                6. Idolatry of Keywords
+            </a>
+            <a href="neophyte-lesson-7.html" class="sidebar-link block px-6 py-3 font-sans text-sm tracking-wide text-gray-400">
+                7. Will vs. Fate
+            </a>
+            <a href="neophyte-lesson-8.html" class="sidebar-link block px-6 py-3 font-sans text-sm tracking-wide text-gray-400">
+                8. Projection & Transference
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-white/10">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center border border-white/10 shadow-inner">
+                    <span class="font-serif text-xs text-gold">N</span>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-center mb-1">
+                        <div class="text-xs font-serif text-paper">Neophyte 0°=0°</div>
+                        <div class="text-[10px] text-gold" id="progress-text">84%</div>
+                    </div>
+                    <div class="w-full bg-gray-900 h-1 rounded-full overflow-hidden">
+                        <div class="bg-gold h-full transition-all duration-1000" id="progress-bar" style="width: 84%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/80 hidden z-40 md:hidden backdrop-blur-sm transition-opacity"></div>
+
+    <main class="flex-1 overflow-y-auto relative custom-scrollbar md:ml-64">
+        
+        <div class="md:hidden fixed top-4 right-4 z-50">
+            <button id="menu-btn" class="w-10 h-10 bg-void/80 border border-gold/30 rounded-full text-gold flex items-center justify-center shadow-lg backdrop-blur">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-8 py-20">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="h-px w-8 bg-gold"></span>
+                <span class="font-sans text-xs tracking-[0.3em] text-gold uppercase">Lesson VI</span>
+            </div>
+            
+            <h1 class="font-serif text-4xl md:text-5xl text-paper mb-4 leading-tight">
+                Idolatry of Keywords<br>
+                <span class="text-gray-500 text-3xl">Breaking the Dead Forms</span>
+            </h1>
+            <p class="font-body text-xl text-gray-400 italic mb-12">"The word is the cage. The image is the bird."</p>
+
+            <section class="mb-20">
+                <h3 class="font-sans text-xs tracking-widest text-gold uppercase mb-6 border-b border-white/10 pb-2">01. The Trap of Labels</h3>
+                <div class="prose prose-invert max-w-none text-gray-300 mb-8">
+                    <p>
+                        A keyword (e.g., "Death means Change") is a useful lie for beginners. It provides a handle to grasp the archetype. But if you hold the handle too long, you never touch the blade.
+                    </p>
+                    <p>
+                        This is <strong>Idolatry</strong>: worshipping the label instead of the force. A reader who sees the <em>Ten of Swords</em> and thinks "Betrayal" without looking at the image is not reading Tarot; they are reading a flashcard.
+                    </p>
+                    <p>
+                        To advance, you must become an <strong>Iconoclast</strong>. You must shatter the rigid keyword to release the living energy trapped inside.
+                    </p>
+                </div>
+            </section>
+
+            <section class="mb-20">
+                <h3 class="font-sans text-xs tracking-widest text-gold uppercase mb-6 border-b border-white/10 pb-2">02. The Iconoclast Protocol</h3>
+                <p class="text-gray-400 text-sm mb-6">The keyword below is dead. It blocks the light. <strong>Click repeatedly</strong> to strike the stone and shatter the idol.</p>
+                
+                <div class="relative w-full max-w-md mx-auto h-80 perspective-1000">
+                    
+                    <div id="idol-stone" class="stone-slab w-full h-full flex flex-col items-center justify-center z-10" onclick="strikeIdol()">
+                        <div id="crack-1" class="crack rotate-12" style="left: 40%"></div>
+                        <div id="crack-2" class="crack -rotate-6" style="left: 60%"></div>
+                        <div id="crack-3" class="crack rotate-45" style="top: 50%; left: 0; width: 100%; height: 2px;"></div>
+
+                        <div class="slab-content text-center">
+                            <i class="fa-solid fa-skull text-6xl mb-4 text-stone-500"></i>
+                            <h2 class="font-serif text-4xl font-bold tracking-widest glitch-text">DEATH</h2>
+                            <p class="font-sans text-xs uppercase tracking-[0.3em] mt-2">"THE END"</p>
+                        </div>
+
+                        <div class="shard shard-tl border-r-0 border-b-0 top-0 left-0 bg-stone"><span class="opacity-10">D</span></div>
+                        <div class="shard shard-tr border-l-0 border-b-0 top-0 left-1/2 bg-stone"><span class="opacity-10">E</span></div>
+                        <div class="shard shard-bl border-r-0 border-t-0 top-1/2 left-0 bg-stone"><span class="opacity-10">A</span></div>
+                        <div class="shard shard-br border-l-0 border-t-0 top-1/2 left-1/2 bg-stone"><span class="opacity-10">TH</span></div>
+                    </div>
+
+                    <div class="truth-layer bg-void border border-gold/30 shadow-[0_0_50px_rgba(197,160,89,0.1)]">
+                        <div class="absolute inset-0 bg-radial-gradient opacity-20"></div>
+                        <i class="fa-solid fa-wheat-awn text-5xl text-gold mb-6 animate-pulse"></i>
+                        <h3 class="font-serif text-3xl text-paper mb-2">TRANSFORMATION</h3>
+                        <p class="font-body text-center max-w-xs text-gray-400 italic">
+                            "The scythe does not kill; it harvests. The seed must break for the stalk to rise."
+                        </p>
+                        <button onclick="resetIdol()" class="mt-8 text-[10px] text-gray-600 hover:text-white uppercase tracking-widest border-b border-gray-800 pb-1">Reset Idol</button>
+                    </div>
+
+                </div>
+
+                <div class="text-center mt-6">
+                    <div id="strike-count" class="font-mono text-xs text-crimson h-4 opacity-0">STRIKE DETECTED</div>
+                </div>
+            </section>
+
+            <section class="mb-20">
+                <h3 class="font-sans text-xs tracking-widest text-gold uppercase mb-6 border-b border-white/10 pb-2">03. Dead vs. Living Language</h3>
+                <p class="text-gray-400 text-sm mb-6">Identify which phrase is a "Dead Label" (Idolatry) and which is a "Living Function" (Qabalah).</p>
+
+                <div class="space-y-4">
+                    <div class="bg-white/5 border border-white/10 p-4 flex flex-col md:flex-row gap-4 items-center justify-between group hover:border-white/20 transition">
+                        <div class="flex-1">
+                            <span class="block font-serif text-lg text-paper mb-1">"The Emperor means Control."</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="checkAnswer(this, 'dead')" class="px-4 py-2 border border-white/10 hover:bg-stone text-xs uppercase">Dead Label</button>
+                            <button onclick="checkAnswer(this, 'living')" class="px-4 py-2 border border-white/10 hover:bg-stone text-xs uppercase">Living Function</button>
+                        </div>
+                        <div class="feedback hidden w-32 text-xs font-mono text-right"></div>
+                    </div>
+
+                    <div class="bg-white/5 border border-white/10 p-4 flex flex-col md:flex-row gap-4 items-center justify-between group hover:border-white/20 transition">
+                        <div class="flex-1">
+                            <span class="block font-serif text-lg text-paper mb-1">"The Emperor structures the chaos of the vision."</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="checkAnswer(this, 'dead')" class="px-4 py-2 border border-white/10 hover:bg-stone text-xs uppercase">Dead Label</button>
+                            <button onclick="checkAnswer(this, 'living')" class="px-4 py-2 border border-white/10 hover:bg-stone text-xs uppercase">Living Function</button>
+                        </div>
+                        <div class="feedback hidden w-32 text-xs font-mono text-right"></div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="flex justify-between items-center border-t border-white/10 pt-8">
+                <a href="neophyte-lesson-5.html" class="text-gray-500 hover:text-white font-sans text-xs tracking-widest uppercase transition">
+                    <i class="fa-solid fa-arrow-left mr-2"></i> Lesson V
+                </a>
+                <a href="neophyte-lesson-7.html" class="group flex items-center gap-4">
+                    <div class="text-right">
+                        <div class="font-sans text-[10px] text-gray-500 tracking-[0.2em] uppercase">Next Lesson</div>
+                        <div class="font-serif text-paper group-hover:text-gold transition">Will vs. Fate</div>
+                    </div>
+                    <div class="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center group-hover:border-gold transition">
+                        <i class="fa-solid fa-arrow-right text-xs text-gray-400 group-hover:text-gold"></i>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- Idol Breaker Logic ---
+        let strikes = 0;
+        const stone = document.getElementById('idol-stone');
+        const countDisplay = document.getElementById('strike-count');
+        
+        function strikeIdol() {
+            if(stone.classList.contains('shattered')) return;
+
+            strikes++;
+            
+            // Visual Shake
+            stone.style.transform = `translate(${Math.random()*4-2}px, ${Math.random()*4-2}px)`;
+            setTimeout(() => stone.style.transform = 'none', 100);
+
+            // Crack Progress
+            if(strikes === 1) document.getElementById('crack-1').style.height = '100%';
+            if(strikes === 2) document.getElementById('crack-2').style.height = '100%';
+            if(strikes === 3) document.getElementById('crack-3').style.width = '100%';
+
+            // Feedback
+            countDisplay.style.opacity = '1';
+            countDisplay.innerText = `IMPACT ${strikes}/4`;
+
+            // Break
+            if(strikes >= 4) {
+                stone.classList.add('shattered');
+                countDisplay.innerText = "IDOL DESTROYED. TRUTH REVEALED.";
+                countDisplay.classList.add('text-gold');
+                countDisplay.classList.remove('text-crimson');
+            }
+        }
+
+        function resetIdol() {
+            strikes = 0;
+            stone.classList.remove('shattered');
+            stone.style.transform = 'none';
+            document.getElementById('crack-1').style.height = '0%';
+            document.getElementById('crack-2').style.height = '0%';
+            document.getElementById('crack-3').style.width = '0%';
+            countDisplay.style.opacity = '0';
+            countDisplay.classList.remove('text-gold');
+            countDisplay.classList.add('text-crimson');
+        }
+
+        // --- Quiz Logic ---
+        function checkAnswer(btn, type) {
+            const parent = btn.parentElement.parentElement;
+            const feedback = parent.querySelector('.feedback');
+            const isQ1 = parent.innerHTML.includes('Emperor means Control');
+            
+            let correct = false;
+            if(isQ1 && type === 'dead') correct = true;
+            if(!isQ1 && type === 'living') correct = true;
+
+            feedback.classList.remove('hidden');
+            if(correct) {
+                feedback.innerHTML = "<span class='text-gold'>CORRECT</span>";
+                btn.classList.add('bg-gold/20', 'border-gold');
+            } else {
+                feedback.innerHTML = "<span class='text-crimson'>INCORRECT</span>";
+                btn.classList.add('bg-crimson/20', 'border-crimson');
+            }
+        }
+
+        // Mobile Menu
+        const menuBtn = document.getElementById('menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        function toggleMenu() {
+            const isClosed = sidebar.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+    </script>
+<!--\ FIXES-INJECTED\ -->\n<script>\ndocument\.addEventListener\("DOMContentLoaded",\ \(\)\ =>\ \{\n\ \ //\ safe\ clock\ updater\n\ \ const\ clockEl\ =\ document\.getElementById\('clock'\);\n\ \ if\ \(clockEl\)\ \{\n\ \ \ \ setInterval\(\(\)\ =>\ \{\n\ \ \ \ \ \ clockEl\.innerText\ =\ \(new\ Date\(\)\)\.toLocaleTimeString\('en-US',\ \{\ hour12:\ false\ }\);\n\ \ \ \ },\ 1000\);\n\ \ }\n\n\ \ //\ safe\ describe\ function\n\ \ const\ stackDesc\ =\ document\.getElementById\('stack-desc'\);\n\ \ const\ descriptions\ =\ \{\n\ \ \ \ 1:\ "<strong\ class='text-white'>ATZILUTH\ \(Archetypal\):</strong>\ The\ pure\ Will\ or\ Seed\.",\n\ \ \ \ 2:\ "<strong\ class='text-blue-400'>BRIAH\ \(Creative\):</strong>\ The\ Mental\ Architecture\.",\n\ \ \ \ 3:\ "<strong\ class='text-purple-400'>YETZIRAH\ \(Formative\):</strong>\ The\ Astral\ Blueprint\.",\n\ \ \ \ 4:\ "<strong\ class='text-orange-500'>ASSIAH\ \(Material\):</strong>\ The\ Physical\ Result\."\n\ \ };\n\ \ window\.describe\ =\ function\(layer\)\ \{\n\ \ \ \ if\ \(!stackDesc\)\ return;\n\ \ \ \ stackDesc\.innerHTML\ =\ descriptions\[layer]\ \|\|\ '';\n\ \ };\n\n\ \ //\ make\ stack-layer\ keyboard\ interactive\ if\ present\n\ \ document\.querySelectorAll\('\.stack-layer'\)\.forEach\(el\ =>\ \{\n\ \ \ \ if\ \(!el\.hasAttribute\('tabindex'\)\)\ el\.setAttribute\('tabindex','0'\);\n\ \ \ \ if\ \(!el\.hasAttribute\('role'\)\)\ el\.setAttribute\('role','button'\);\n\ \ \ \ //\ support\ keyboard\ activation\ to\ mirror\ onmouseenter\ behavior\n\ \ \ \ el\.addEventListener\('keydown',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ if\ \(e\.key\ ===\ 'Enter'\ \|\|\ e\.key\ ===\ '\ '\)\ \{\n\ \ \ \ \ \ \ \ e\.preventDefault\(\);\n\ \ \ \ \ \ \ \ //\ if\ element\ has\ onmouseenter\ attribute,\ try\ to\ extract\ layer\ number\ from\ innerText\n\ \ \ \ \ \ \ \ const\ m\ =\ el\.getAttribute\('onmouseenter'\)\ \|\|\ '';\n\ \ \ \ \ \ \ \ const\ match\ =\ m\.match\(/describe\\\(\(\\d\+\)\\\)/\);\n\ \ \ \ \ \ \ \ if\ \(match\)\ window\.describe\(Number\(match\[1]\)\);\n\ \ \ \ \ \ }\n\ \ \ \ }\);\n\ \ }\);\n\n\ \ //\ Oath\ checks\ \+\ unlock\ flow\ \(safe\ if\ absent\)\n\ \ const\ checks\ =\ Array\.from\(document\.querySelectorAll\('\.oath-check'\)\);\n\ \ const\ unlockBtn\ =\ document\.getElementById\('unlock-btn'\);\n\ \ const\ modulesGrid\ =\ document\.getElementById\('modules-grid'\);\n\ \ const\ header\ =\ document\.querySelector\('header'\);\n\n\ \ if\ \(checks\.length\ &&\ unlockBtn\ &&\ modulesGrid\)\ \{\n\ \ \ \ function\ updateState\(\)\ \{\n\ \ \ \ \ \ const\ allChecked\ =\ checks\.every\(c\ =>\ c\.checked\);\n\ \ \ \ \ \ unlockBtn\.disabled\ =\ !allChecked;\n\ \ \ \ \ \ unlockBtn\.setAttribute\('aria-disabled',\ String\(!allChecked\)\);\n\ \ \ \ }\n\n\ \ \ \ checks\.forEach\(check\ =>\ \{\n\ \ \ \ \ \ //\ visual\ sync\ for\ custom\ checkbox\n\ \ \ \ \ \ check\.addEventListener\('change',\ \(\)\ =>\ \{\n\ \ \ \ \ \ \ \ const\ box\ =\ check\.nextElementSibling;\n\ \ \ \ \ \ \ \ if\ \(box\)\ \{\n\ \ \ \ \ \ \ \ \ \ const\ icon\ =\ box\.querySelector\('i'\);\n\ \ \ \ \ \ \ \ \ \ if\ \(icon\)\ icon\.style\.opacity\ =\ check\.checked\ \?\ '1'\ :\ '0';\n\ \ \ \ \ \ \ \ }\n\ \ \ \ \ \ \ \ updateState\(\);\n\ \ \ \ \ \ }\);\n\n\ \ \ \ \ \ const\ label\ =\ check\.closest\('label'\);\n\ \ \ \ \ \ if\ \(label\)\ \{\n\ \ \ \ \ \ \ \ label\.addEventListener\('keydown',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ \ \ \ \ if\ \(e\.key\ ===\ '\ '\ \|\|\ e\.key\ ===\ 'Enter'\)\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ e\.preventDefault\(\);\n\ \ \ \ \ \ \ \ \ \ \ \ check\.checked\ =\ !check\.checked;\n\ \ \ \ \ \ \ \ \ \ \ \ check\.dispatchEvent\(new\ Event\('change',\ \{\ bubbles:\ true\ }\)\);\n\ \ \ \ \ \ \ \ \ \ }\n\ \ \ \ \ \ \ \ }\);\n\ \ \ \ \ \ \ \ label\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ \ \ \ \ if\ \(e\.target\ ===\ check\)\ return;\n\ \ \ \ \ \ \ \ \ \ check\.checked\ =\ !check\.checked;\n\ \ \ \ \ \ \ \ \ \ check\.dispatchEvent\(new\ Event\('change',\ \{\ bubbles:\ true\ }\)\);\n\ \ \ \ \ \ \ \ }\);\n\ \ \ \ \ \ }\n\ \ \ \ }\);\n\n\ \ \ \ unlockBtn\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ if\ \(unlockBtn\.disabled\)\ return;\n\ \ \ \ \ \ unlockBtn\.disabled\ =\ true;\n\ \ \ \ \ \ unlockBtn\.setAttribute\('aria-expanded',\ 'true'\);\n\ \ \ \ \ \ unlockBtn\.classList\.remove\('border-border',\ 'text-text'\);\n\ \ \ \ \ \ unlockBtn\.classList\.add\('border-success',\ 'text-success',\ 'bg-success/10'\);\n\ \ \ \ \ \ unlockBtn\.innerHTML\ =\ '<span\ class="relative\ z-10"><i\ class="fa-solid\ fa-check\ mr-2"></i>ACCESS\ GRANTED</span><div\ class="absolute\ inset-0\ bg-gold/5\ transform\ -translate-x-full\ group-hover:translate-x-0\ transition-transform\ duration-500\ ease-in-out"\ aria-hidden="true"></div>';\n\n\ \ \ \ \ \ //\ reveal\ modules\ safely\n\ \ \ \ \ \ modulesGrid\.classList\.remove\('opacity-30','pointer-events-none','grayscale','blur-\[2px]'\);\n\ \ \ \ \ \ modulesGrid\.setAttribute\('aria-hidden','false'\);\n\n\ \ \ \ \ \ //\ scroll\ to\ modules\ accounting\ for\ sticky\ header\n\ \ \ \ \ \ const\ headerHeight\ =\ header\ \?\ header\.offsetHeight\ :\ 0;\n\ \ \ \ \ \ const\ rectTop\ =\ modulesGrid\.getBoundingClientRect\(\)\.top\ \+\ window\.scrollY;\n\ \ \ \ \ \ const\ target\ =\ Math\.max\(0,\ rectTop\ -\ headerHeight\ -\ 12\);\n\ \ \ \ \ \ window\.scrollTo\(\{\ top:\ target,\ behavior:\ 'smooth'\ }\);\n\n\ \ \ \ \ \ //\ enable\ focus\ on\ links\ and\ focus\ first\ link\n\ \ \ \ \ \ setTimeout\(\(\)\ =>\ \{\n\ \ \ \ \ \ \ \ const\ links\ =\ modulesGrid\.querySelectorAll\('a\[href]'\);\n\ \ \ \ \ \ \ \ links\.forEach\(link\ =>\ link\.setAttribute\('tabindex','0'\)\);\n\ \ \ \ \ \ \ \ const\ first\ =\ modulesGrid\.querySelector\('a\[href]'\);\n\ \ \ \ \ \ \ \ if\ \(first\)\ first\.focus\(\);\n\ \ \ \ \ \ },\ 450\);\n\ \ \ \ }\);\n\n\ \ \ \ //\ ensure\ initial\ state\n\ \ \ \ updateState\(\);\n\ \ }\n\n\ \ //\ ensure\ module\ links\ are\ clickable\ even\ if\ some\ parent\ had\ pointer-events\ disabled\n\ \ document\.querySelectorAll\('\#modules-grid\ a\[href]'\)\.forEach\(a\ =>\ \{\n\ \ \ \ a\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ //\ ensure\ normal\ navigation\ on\ click\n\ \ \ \ \ \ if\ \(a\.getAttribute\('href'\)\)\ return;\n\ \ \ \ }\);\n\ \ \ \ //\ ensure\ correct\ relative\ href\ prefix\ \(best-effort\)\n\ \ \ \ const\ href\ =\ a\.getAttribute\('href'\)\ \|\|\ '';\n\ \ \ \ if\ \(href\ &&\ !href\.startsWith\('\./'\)\ &&\ !href\.startsWith\('http'\)\ &&\ !href\.startsWith\('/'\)\)\ \{\n\ \ \ \ \ \ a\.setAttribute\('href',\ '\./'\ \+\ href\);\n\ \ \ \ }\n\ \ }\);\n}\);\n</script><!--\ FIXES-INJECTED\ -->\n<script>\ndocument\.addEventListener\('DOMContentLoaded',\ \(\)\ =>\ \{\n\ \ try\ \{\n\ \ \ \ if\ \(!document\.getElementById\('console-output'\)\)\ \{\n\ \ \ \ \ \ const\ d\ =\ document\.createElement\('div'\);\ d\.id\ =\ 'console-output';\ d\.style\.display\ =\ 'none';\ document\.body\.appendChild\(d\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('unlock-btn'\)\)\ \{\n\ \ \ \ \ \ const\ b\ =\ document\.createElement\('button'\);\ b\.id\ =\ 'unlock-btn';\ b\.style\.display\ =\ 'none';\ document\.body\.appendChild\(b\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('modules-grid'\)\)\ \{\n\ \ \ \ \ \ const\ m\ =\ document\.createElement\('div'\);\ m\.id\ =\ 'modules-grid';\ m\.style\.display\ =\ 'none';\ document\.body\.appendChild\(m\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('stage-4'\)\)\ \{\n\ \ \ \ \ \ const\ s\ =\ document\.createElement\('section'\);\ s\.id\ =\ 'stage-4';\ s\.style\.display\ =\ 'none';\ document\.body\.appendChild\(s\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('option-c'\)\)\ \{\n\ \ \ \ \ \ const\ oc\ =\ document\.createElement\('button'\);\ oc\.id\ =\ 'option-c';\ oc\.style\.display\ =\ 'none';\ document\.body\.appendChild\(oc\);\n\ \ \ \ }\n\n\ \ \ \ document\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ const\ opt\ =\ e\.target\.closest\('\.option-btn'\);\n\ \ \ \ \ \ if\ \(opt\)\ \{\n\ \ \ \ \ \ \ \ const\ reason\ =\ opt\.dataset\.failure\ \|\|\ 'Incorrect\ choice\.';\n\ \ \ \ \ \ \ \ if\ \(typeof\ window\.failLog\ ===\ 'function'\)\ window\.failLog\(reason\);\n\ \ \ \ \ \ \ \ else\ console\.error\(reason\);\n\ \ \ \ \ \ }\n\ \ \ \ \ \ const\ oc\ =\ e\.target\.closest\('\#option-c'\);\n\ \ \ \ \ \ if\ \(oc\)\ \{\n\ \ \ \ \ \ \ \ if\ \(typeof\ window\.finishExam\ ===\ 'function'\)\ window\.finishExam\(\);\n\ \ \ \ \ \ }\n\ \ \ \ },\ true\);\n\ \ }\ catch\ \(err\)\ \{\n\ \ \ \ console\.error\('FIXES-INJECTED\ error',\ err\);\n\ \ }\n}\);\n</script></body>
+</html>
+

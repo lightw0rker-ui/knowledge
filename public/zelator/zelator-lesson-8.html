@@ -1,0 +1,359 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM: ZELATOR // MODULE 08</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#030005', 
+                        obsidian: '#0a0a0f',
+                        silver: '#94a3b8',
+                        electric: '#a78bfa',
+                        solar: '#fbbf24', // Gold
+                        gold: '#d97706',
+                    },
+                    fontFamily: {
+                        serif: ['"Cinzel"', 'serif'],
+                        body: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'grid': "url('data:image/svg+xml,%3Csvg width=\\'40\\' height=\\'40\\' viewBox=\\'0 0 40 40\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cpath d=\\'M0 0h40v40H0V0zm1 1h38v38H1V1z\\' fill=\\'%23fbbf24\\' fill-opacity=\\'0.02\\' fill-rule=\\'evenodd\\'/%3E%3C/svg%3E')",
+                    },
+                    animation: {
+                        'spin-slow': 'spin 20s linear infinite',
+                        'spin-reverse': 'spin 25s linear infinite reverse',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #030005;
+            color: #e2e8f0;
+        }
+
+        .tech-border {
+            position: relative;
+            background: rgba(10, 10, 15, 0.6);
+            border: 1px solid rgba(251, 191, 36, 0.15); /* Solar Border */
+            transition: all 0.2s ease;
+        }
+        
+        .tech-border::before, .tech-border::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #fbbf24;
+            opacity: 0.5;
+        }
+        .tech-border::before { top: -1px; left: -1px; }
+        .tech-border::after { bottom: -1px; right: -1px; }
+
+        /* The Solar Gimbal */
+        .gimbal-container {
+            perspective: 1000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            position: relative;
+        }
+
+        .ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .ring-1 { width: 200px; height: 200px; border-width: 2px; border-color: rgba(251, 191, 36, 0.6); }
+        .ring-2 { width: 160px; height: 160px; border-style: dashed; }
+        .ring-3 { width: 120px; height: 120px; border-width: 4px; border-color: rgba(251, 191, 36, 0.2); }
+
+        .core-sun {
+            width: 40px; height: 40px;
+            background: radial-gradient(circle, #fff 0%, #fbbf24 50%, transparent 80%);
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 50px #fbbf24;
+            opacity: 0.5;
+            transition: all 0.5s ease;
+        }
+
+        /* Signal Noise */
+        .signal-text {
+            font-family: 'JetBrains Mono', monospace;
+            color: #fbbf24;
+            text-align: center;
+            filter: blur(8px);
+            opacity: 0.5;
+            transition: all 0.2s ease;
+            text-shadow: 0 0 10px #fbbf24;
+        }
+
+        .locked .ring { border-color: #fff; box-shadow: 0 0 30px #fbbf24; }
+        .locked .core-sun { opacity: 1; transform: scale(1.5); background: #fff; }
+        
+        /* Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px; width: 10px;
+            background: #fbbf24;
+            border: 1px solid #fff;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 0 15px #fbbf24;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 2px;
+            background: rgba(255,255,255,0.1);
+        }
+
+    </style>
+</head>
+<body class="bg-void bg-grid min-h-screen flex overflow-hidden font-sans selection:bg-solar selection:text-black">
+
+    <aside class="w-72 border-r border-white/5 hidden md:flex flex-col z-20 bg-void/90 backdrop-blur-md h-screen">
+        <div class="p-6 border-b border-white/5">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 border border-electric/30 flex items-center justify-center bg-electric/5">
+                    <i class="fa-solid fa-cube text-electric text-xs"></i>
+                </div>
+                <div>
+                    <div class="font-mono text-[10px] text-electric tracking-[0.2em]">ESOTAROT</div>
+                    <div class="font-mono text-[10px] text-gray-500">MODULE 08 // LOADED</div>
+                </div>
+            </div>
+            
+            <a href="zelator-intro.html" class="group flex items-center gap-2 px-2 py-1 mb-2 text-[10px] font-mono text-gray-500 hover:text-white transition-colors">
+                <i class="fa-solid fa-arrow-left text-[8px] group-hover:-translate-x-1 transition-transform"></i> RETURN TO DASHBOARD
+            </a>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+            <div class="px-2 mb-4 font-mono text-[9px] text-gray-600 uppercase tracking-widest border-b border-white/5 pb-2">Sequence</div>
+            
+            <a href="zelator-lesson-6.html" class="block px-3 py-2 text-xs font-mono text-gray-500 hover:text-white hover:bg-white/5 border-l-2 border-transparent transition-all">
+                06 Color Scales
+            </a>
+            <a href="zelator-lesson-7.html" class="block px-3 py-2 text-xs font-mono text-gray-500 hover:text-white hover:bg-white/5 border-l-2 border-transparent transition-all">
+                07 Binah vs. Chokmah
+            </a>
+            <a href="#" class="block px-3 py-2 text-xs font-mono text-white bg-white/5 border-l-2 border-solar transition-all">
+                08 Tiphareth Center
+            </a>
+            <a href="zelator-lesson-9.html" class="block px-3 py-2 text-xs font-mono text-gray-500 hover:text-white hover:bg-white/5 border-l-2 border-transparent transition-all">
+                09 Yesod Machinery
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-white/5">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-indigo-900/20 border border-indigo-500/30 flex items-center justify-center text-electric font-serif text-xs">Z</div>
+                <div>
+                    <div class="text-[10px] font-mono text-gray-400">INITIATE</div>
+                    <div class="text-[9px] font-mono text-gray-600">PROGRESS: 96%</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto relative custom-scrollbar z-10">
+        
+        <header class="max-w-7xl mx-auto px-8 py-16">
+            <div class="flex items-center gap-4 mb-6">
+                <span class="h-px w-8 bg-solar"></span>
+                <span class="font-mono text-[10px] tracking-[0.3em] text-solar uppercase">Module 08</span>
+            </div>
+            
+            <h1 class="font-serif text-4xl md:text-5xl text-white mb-6 leading-tight">
+                Tiphareth<br>
+                <span class="text-gray-500 text-3xl">The Coherence Engine</span>
+            </h1>
+
+            <article class="max-w-3xl border-l border-solar/30 pl-6 mb-16">
+                <p class="font-body text-xl text-gray-300 leading-relaxed mb-4">
+                    Tiphareth is the "Central Processing Unit" of the Tree of Life. It mediates between the high-voltage abstract commands of the Supernals and the low-voltage physical reality of Malkuth.
+                </p>
+                <p class="font-mono text-xs text-gray-500 leading-relaxed mb-4">
+                    // DEFINITION: Tiphareth (6) represents Balance, Harmony, and Truth. It is the solar point of clarity where all forces equilibrate.
+                </p>
+                <p class="font-mono text-xs text-gray-500 leading-relaxed">
+                    // THE SIXES: In Tarot, the four 6s are the "Repair Codes." After the conflict of the 5s, the 6s restore the signal to harmony.
+                </p>
+            </article>
+
+            <div class="tech-border bg-obsidian/50 p-8 rounded-sm mb-16 shadow-2xl">
+                
+                <div class="flex flex-col lg:flex-row gap-12 items-center">
+                    
+                    <div class="w-full lg:w-1/2 relative">
+                        <div class="absolute inset-0 bg-solar/5 blur-3xl rounded-full"></div>
+                        
+                        <div class="gimbal-container" id="gimbal">
+                            <div class="ring ring-1" id="r1"></div>
+                            <div class="ring ring-2" id="r2"></div>
+                            <div class="ring ring-3" id="r3"></div>
+                            <div class="core-sun"></div>
+                        </div>
+
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div class="signal-text text-xl md:text-3xl" id="signal-msg">
+                                TRUTH IS FREQUENCY
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="w-full lg:w-1/2 space-y-8">
+                        
+                        <div class="border-b border-white/10 pb-4">
+                            <h3 class="font-serif text-2xl text-white mb-2">Signal Calibration</h3>
+                            <p class="font-mono text-[10px] text-gray-400">
+                                Align the oscillating rings to achieve signal coherence.
+                                <br>CURRENT OFFSET: <span id="offset-val" class="text-solar">50</span>%
+                            </p>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between font-mono text-[9px] text-gray-500 mb-2">
+                                <span>CHAOS (5)</span>
+                                <span>COHERENCE (6)</span>
+                                <span>CHAOS (7)</span>
+                            </div>
+                            <input type="range" min="0" max="100" value="0" id="tuner" oninput="tuneSignal(this.value)">
+                        </div>
+
+                        <div class="bg-black/40 border border-white/10 p-6 min-h-[150px] flex items-center justify-center text-center">
+                            <div id="data-output" class="hidden animate-pulse">
+                                <i class="fa-solid fa-check-circle text-solar text-3xl mb-3"></i>
+                                <div class="font-serif text-white text-xl">System Locked</div>
+                                <div class="font-mono text-[10px] text-solar mt-1">THE SIXES ARE ACTIVE</div>
+                            </div>
+                            <div id="data-noise" class="font-mono text-xs text-gray-600">
+                                // AWAITING ALIGNMENT //
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-20">
+                <div class="bg-white/5 border border-white/10 p-6 group hover:border-wands transition">
+                    <div class="font-mono text-[10px] text-gray-500 mb-2">6 OF WANDS</div>
+                    <h3 class="font-serif text-lg text-white group-hover:text-wands transition">Victory</h3>
+                    <p class="font-body text-xs text-gray-400 mt-2">
+                        Energy centered. Leadership accepted. The hero returns.
+                    </p>
+                </div>
+                <div class="bg-white/5 border border-white/10 p-6 group hover:border-cups transition">
+                    <div class="font-mono text-[10px] text-gray-500 mb-2">6 OF CUPS</div>
+                    <h3 class="font-serif text-lg text-white group-hover:text-cups transition">Pleasure</h3>
+                    <p class="font-body text-xs text-gray-400 mt-2">
+                        Emotion centered. Nostalgia, innocence, and simple joy.
+                    </p>
+                </div>
+                <div class="bg-white/5 border border-white/10 p-6 group hover:border-swords transition">
+                    <div class="font-mono text-[10px] text-gray-500 mb-2">6 OF SWORDS</div>
+                    <h3 class="font-serif text-lg text-white group-hover:text-swords transition">Science</h3>
+                    <p class="font-body text-xs text-gray-400 mt-2">
+                        Mind centered. Moving away from trouble. Analytical solutions.
+                    </p>
+                </div>
+                <div class="bg-white/5 border border-white/10 p-6 group hover:border-pentacles transition">
+                    <div class="font-mono text-[10px] text-gray-500 mb-2">6 OF PENTACLES</div>
+                    <h3 class="font-serif text-lg text-white group-hover:text-pentacles transition">Success</h3>
+                    <p class="font-body text-xs text-gray-400 mt-2">
+                        Matter centered. Charity, exchange, and resource flow.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center border-t border-white/10 pt-8">
+                <a href="zelator-lesson-7.html" class="text-gray-500 hover:text-white font-mono text-xs tracking-widest uppercase transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Previous Protocol
+                </a>
+                <a href="zelator-lesson-9.html" class="group flex items-center gap-4">
+                    <div class="text-right">
+                        <div class="font-mono text-[9px] text-gray-500 tracking-[0.2em] uppercase">Next Protocol</div>
+                        <div class="font-serif text-white group-hover:text-electric transition">Yesod Machinery</div>
+                    </div>
+                    <div class="w-10 h-10 border border-white/20 flex items-center justify-center group-hover:border-electric transition bg-white/5">
+                        <i class="fa-solid fa-arrow-right text-xs text-gray-400 group-hover:text-electric"></i>
+                    </div>
+                </a>
+            </div>
+            
+        </header>
+    </main>
+
+    <script>
+        const r1 = document.getElementById('r1');
+        const r2 = document.getElementById('r2');
+        const r3 = document.getElementById('r3');
+        const signal = document.getElementById('signal-msg');
+        const gimbal = document.getElementById('gimbal');
+        const offsetVal = document.getElementById('offset-val');
+        const output = document.getElementById('data-output');
+        const noise = document.getElementById('data-noise');
+
+        function tuneSignal(val) {
+            const v = parseInt(val);
+            const deviation = Math.abs(50 - v); // 0 is perfect center
+            
+            offsetVal.innerText = deviation * 2; // Display 0-100 error
+
+            // Rotate rings based on deviation (chaos)
+            r1.style.transform = `rotateX(${deviation * 4}deg) rotateY(${deviation * 2}deg)`;
+            r2.style.transform = `rotateX(${deviation * -3}deg) rotateY(${deviation * 5}deg)`;
+            r3.style.transform = `rotateX(${deviation * 6}deg) rotateY(${deviation * -4}deg)`;
+
+            // Blur Text
+            const blurAmount = (deviation / 50) * 10;
+            signal.style.filter = `blur(${blurAmount}px)`;
+            signal.style.opacity = 1 - (deviation / 60);
+
+            // Check Lock
+            if (deviation < 2) {
+                gimbal.classList.add('locked');
+                signal.style.filter = 'blur(0px)';
+                signal.style.opacity = '1';
+                signal.style.color = '#fff';
+                
+                output.classList.remove('hidden');
+                noise.classList.add('hidden');
+            } else {
+                gimbal.classList.remove('locked');
+                signal.style.color = '#fbbf24';
+                
+                output.classList.add('hidden');
+                noise.classList.remove('hidden');
+            }
+        }
+
+        // Init
+        tuneSignal(0);
+    </script>
+<!--\ FIXES-INJECTED\ -->\n<script>\ndocument\.addEventListener\("DOMContentLoaded",\ \(\)\ =>\ \{\n\ \ //\ safe\ clock\ updater\n\ \ const\ clockEl\ =\ document\.getElementById\('clock'\);\n\ \ if\ \(clockEl\)\ \{\n\ \ \ \ setInterval\(\(\)\ =>\ \{\n\ \ \ \ \ \ clockEl\.innerText\ =\ \(new\ Date\(\)\)\.toLocaleTimeString\('en-US',\ \{\ hour12:\ false\ }\);\n\ \ \ \ },\ 1000\);\n\ \ }\n\n\ \ //\ safe\ describe\ function\n\ \ const\ stackDesc\ =\ document\.getElementById\('stack-desc'\);\n\ \ const\ descriptions\ =\ \{\n\ \ \ \ 1:\ "<strong\ class='text-white'>ATZILUTH\ \(Archetypal\):</strong>\ The\ pure\ Will\ or\ Seed\.",\n\ \ \ \ 2:\ "<strong\ class='text-blue-400'>BRIAH\ \(Creative\):</strong>\ The\ Mental\ Architecture\.",\n\ \ \ \ 3:\ "<strong\ class='text-purple-400'>YETZIRAH\ \(Formative\):</strong>\ The\ Astral\ Blueprint\.",\n\ \ \ \ 4:\ "<strong\ class='text-orange-500'>ASSIAH\ \(Material\):</strong>\ The\ Physical\ Result\."\n\ \ };\n\ \ window\.describe\ =\ function\(layer\)\ \{\n\ \ \ \ if\ \(!stackDesc\)\ return;\n\ \ \ \ stackDesc\.innerHTML\ =\ descriptions\[layer]\ \|\|\ '';\n\ \ };\n\n\ \ //\ make\ stack-layer\ keyboard\ interactive\ if\ present\n\ \ document\.querySelectorAll\('\.stack-layer'\)\.forEach\(el\ =>\ \{\n\ \ \ \ if\ \(!el\.hasAttribute\('tabindex'\)\)\ el\.setAttribute\('tabindex','0'\);\n\ \ \ \ if\ \(!el\.hasAttribute\('role'\)\)\ el\.setAttribute\('role','button'\);\n\ \ \ \ //\ support\ keyboard\ activation\ to\ mirror\ onmouseenter\ behavior\n\ \ \ \ el\.addEventListener\('keydown',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ if\ \(e\.key\ ===\ 'Enter'\ \|\|\ e\.key\ ===\ '\ '\)\ \{\n\ \ \ \ \ \ \ \ e\.preventDefault\(\);\n\ \ \ \ \ \ \ \ //\ if\ element\ has\ onmouseenter\ attribute,\ try\ to\ extract\ layer\ number\ from\ innerText\n\ \ \ \ \ \ \ \ const\ m\ =\ el\.getAttribute\('onmouseenter'\)\ \|\|\ '';\n\ \ \ \ \ \ \ \ const\ match\ =\ m\.match\(/describe\\\(\(\\d\+\)\\\)/\);\n\ \ \ \ \ \ \ \ if\ \(match\)\ window\.describe\(Number\(match\[1]\)\);\n\ \ \ \ \ \ }\n\ \ \ \ }\);\n\ \ }\);\n\n\ \ //\ Oath\ checks\ \+\ unlock\ flow\ \(safe\ if\ absent\)\n\ \ const\ checks\ =\ Array\.from\(document\.querySelectorAll\('\.oath-check'\)\);\n\ \ const\ unlockBtn\ =\ document\.getElementById\('unlock-btn'\);\n\ \ const\ modulesGrid\ =\ document\.getElementById\('modules-grid'\);\n\ \ const\ header\ =\ document\.querySelector\('header'\);\n\n\ \ if\ \(checks\.length\ &&\ unlockBtn\ &&\ modulesGrid\)\ \{\n\ \ \ \ function\ updateState\(\)\ \{\n\ \ \ \ \ \ const\ allChecked\ =\ checks\.every\(c\ =>\ c\.checked\);\n\ \ \ \ \ \ unlockBtn\.disabled\ =\ !allChecked;\n\ \ \ \ \ \ unlockBtn\.setAttribute\('aria-disabled',\ String\(!allChecked\)\);\n\ \ \ \ }\n\n\ \ \ \ checks\.forEach\(check\ =>\ \{\n\ \ \ \ \ \ //\ visual\ sync\ for\ custom\ checkbox\n\ \ \ \ \ \ check\.addEventListener\('change',\ \(\)\ =>\ \{\n\ \ \ \ \ \ \ \ const\ box\ =\ check\.nextElementSibling;\n\ \ \ \ \ \ \ \ if\ \(box\)\ \{\n\ \ \ \ \ \ \ \ \ \ const\ icon\ =\ box\.querySelector\('i'\);\n\ \ \ \ \ \ \ \ \ \ if\ \(icon\)\ icon\.style\.opacity\ =\ check\.checked\ \?\ '1'\ :\ '0';\n\ \ \ \ \ \ \ \ }\n\ \ \ \ \ \ \ \ updateState\(\);\n\ \ \ \ \ \ }\);\n\n\ \ \ \ \ \ const\ label\ =\ check\.closest\('label'\);\n\ \ \ \ \ \ if\ \(label\)\ \{\n\ \ \ \ \ \ \ \ label\.addEventListener\('keydown',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ \ \ \ \ if\ \(e\.key\ ===\ '\ '\ \|\|\ e\.key\ ===\ 'Enter'\)\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ e\.preventDefault\(\);\n\ \ \ \ \ \ \ \ \ \ \ \ check\.checked\ =\ !check\.checked;\n\ \ \ \ \ \ \ \ \ \ \ \ check\.dispatchEvent\(new\ Event\('change',\ \{\ bubbles:\ true\ }\)\);\n\ \ \ \ \ \ \ \ \ \ }\n\ \ \ \ \ \ \ \ }\);\n\ \ \ \ \ \ \ \ label\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ \ \ \ \ if\ \(e\.target\ ===\ check\)\ return;\n\ \ \ \ \ \ \ \ \ \ check\.checked\ =\ !check\.checked;\n\ \ \ \ \ \ \ \ \ \ check\.dispatchEvent\(new\ Event\('change',\ \{\ bubbles:\ true\ }\)\);\n\ \ \ \ \ \ \ \ }\);\n\ \ \ \ \ \ }\n\ \ \ \ }\);\n\n\ \ \ \ unlockBtn\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ if\ \(unlockBtn\.disabled\)\ return;\n\ \ \ \ \ \ unlockBtn\.disabled\ =\ true;\n\ \ \ \ \ \ unlockBtn\.setAttribute\('aria-expanded',\ 'true'\);\n\ \ \ \ \ \ unlockBtn\.classList\.remove\('border-border',\ 'text-text'\);\n\ \ \ \ \ \ unlockBtn\.classList\.add\('border-success',\ 'text-success',\ 'bg-success/10'\);\n\ \ \ \ \ \ unlockBtn\.innerHTML\ =\ '<span\ class="relative\ z-10"><i\ class="fa-solid\ fa-check\ mr-2"></i>ACCESS\ GRANTED</span><div\ class="absolute\ inset-0\ bg-gold/5\ transform\ -translate-x-full\ group-hover:translate-x-0\ transition-transform\ duration-500\ ease-in-out"\ aria-hidden="true"></div>';\n\n\ \ \ \ \ \ //\ reveal\ modules\ safely\n\ \ \ \ \ \ modulesGrid\.classList\.remove\('opacity-30','pointer-events-none','grayscale','blur-\[2px]'\);\n\ \ \ \ \ \ modulesGrid\.setAttribute\('aria-hidden','false'\);\n\n\ \ \ \ \ \ //\ scroll\ to\ modules\ accounting\ for\ sticky\ header\n\ \ \ \ \ \ const\ headerHeight\ =\ header\ \?\ header\.offsetHeight\ :\ 0;\n\ \ \ \ \ \ const\ rectTop\ =\ modulesGrid\.getBoundingClientRect\(\)\.top\ \+\ window\.scrollY;\n\ \ \ \ \ \ const\ target\ =\ Math\.max\(0,\ rectTop\ -\ headerHeight\ -\ 12\);\n\ \ \ \ \ \ window\.scrollTo\(\{\ top:\ target,\ behavior:\ 'smooth'\ }\);\n\n\ \ \ \ \ \ //\ enable\ focus\ on\ links\ and\ focus\ first\ link\n\ \ \ \ \ \ setTimeout\(\(\)\ =>\ \{\n\ \ \ \ \ \ \ \ const\ links\ =\ modulesGrid\.querySelectorAll\('a\[href]'\);\n\ \ \ \ \ \ \ \ links\.forEach\(link\ =>\ link\.setAttribute\('tabindex','0'\)\);\n\ \ \ \ \ \ \ \ const\ first\ =\ modulesGrid\.querySelector\('a\[href]'\);\n\ \ \ \ \ \ \ \ if\ \(first\)\ first\.focus\(\);\n\ \ \ \ \ \ },\ 450\);\n\ \ \ \ }\);\n\n\ \ \ \ //\ ensure\ initial\ state\n\ \ \ \ updateState\(\);\n\ \ }\n\n\ \ //\ ensure\ module\ links\ are\ clickable\ even\ if\ some\ parent\ had\ pointer-events\ disabled\n\ \ document\.querySelectorAll\('\#modules-grid\ a\[href]'\)\.forEach\(a\ =>\ \{\n\ \ \ \ a\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ //\ ensure\ normal\ navigation\ on\ click\n\ \ \ \ \ \ if\ \(a\.getAttribute\('href'\)\)\ return;\n\ \ \ \ }\);\n\ \ \ \ //\ ensure\ correct\ relative\ href\ prefix\ \(best-effort\)\n\ \ \ \ const\ href\ =\ a\.getAttribute\('href'\)\ \|\|\ '';\n\ \ \ \ if\ \(href\ &&\ !href\.startsWith\('\./'\)\ &&\ !href\.startsWith\('http'\)\ &&\ !href\.startsWith\('/'\)\)\ \{\n\ \ \ \ \ \ a\.setAttribute\('href',\ '\./'\ \+\ href\);\n\ \ \ \ }\n\ \ }\);\n}\);\n</script><!--\ FIXES-INJECTED\ -->\n<script>\ndocument\.addEventListener\('DOMContentLoaded',\ \(\)\ =>\ \{\n\ \ try\ \{\n\ \ \ \ if\ \(!document\.getElementById\('console-output'\)\)\ \{\n\ \ \ \ \ \ const\ d\ =\ document\.createElement\('div'\);\ d\.id\ =\ 'console-output';\ d\.style\.display\ =\ 'none';\ document\.body\.appendChild\(d\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('unlock-btn'\)\)\ \{\n\ \ \ \ \ \ const\ b\ =\ document\.createElement\('button'\);\ b\.id\ =\ 'unlock-btn';\ b\.style\.display\ =\ 'none';\ document\.body\.appendChild\(b\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('modules-grid'\)\)\ \{\n\ \ \ \ \ \ const\ m\ =\ document\.createElement\('div'\);\ m\.id\ =\ 'modules-grid';\ m\.style\.display\ =\ 'none';\ document\.body\.appendChild\(m\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('stage-4'\)\)\ \{\n\ \ \ \ \ \ const\ s\ =\ document\.createElement\('section'\);\ s\.id\ =\ 'stage-4';\ s\.style\.display\ =\ 'none';\ document\.body\.appendChild\(s\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('option-c'\)\)\ \{\n\ \ \ \ \ \ const\ oc\ =\ document\.createElement\('button'\);\ oc\.id\ =\ 'option-c';\ oc\.style\.display\ =\ 'none';\ document\.body\.appendChild\(oc\);\n\ \ \ \ }\n\n\ \ \ \ document\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ const\ opt\ =\ e\.target\.closest\('\.option-btn'\);\n\ \ \ \ \ \ if\ \(opt\)\ \{\n\ \ \ \ \ \ \ \ const\ reason\ =\ opt\.dataset\.failure\ \|\|\ 'Incorrect\ choice\.';\n\ \ \ \ \ \ \ \ if\ \(typeof\ window\.failLog\ ===\ 'function'\)\ window\.failLog\(reason\);\n\ \ \ \ \ \ \ \ else\ console\.error\(reason\);\n\ \ \ \ \ \ }\n\ \ \ \ \ \ const\ oc\ =\ e\.target\.closest\('\#option-c'\);\n\ \ \ \ \ \ if\ \(oc\)\ \{\n\ \ \ \ \ \ \ \ if\ \(typeof\ window\.finishExam\ ===\ 'function'\)\ window\.finishExam\(\);\n\ \ \ \ \ \ }\n\ \ \ \ },\ true\);\n\ \ }\ catch\ \(err\)\ \{\n\ \ \ \ console\.error\('FIXES-INJECTED\ error',\ err\);\n\ \ }\n}\);\n</script></body>
+</html>
+

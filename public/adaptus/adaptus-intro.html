@@ -1,0 +1,365 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADEPTUS // SYSTEM INITIALIZATION</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            void: "#030304",
+            panel: "#0a0a0f",
+            border: "#1f1f2e",
+            text: "#888899",
+            highlight: "#e2e8f0",
+            gold: "#d4af37",
+            goldDim: "rgba(212, 175, 55, 0.1)",
+            alert: "#ef4444",
+            success: "#10b981",
+          },
+          fontFamily: {
+            serif: ['"Cinzel"', 'serif'],
+            sans: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'scan': 'scan 4s linear infinite',
+          },
+          keyframes: {
+            scan: {
+              '0%': { transform: 'translateY(-100%)' },
+              '100%': { transform: 'translateY(100%)' }
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body { background-color: #030304; color: #888899; overflow-x: hidden; }
+    
+    /* Technical Grid Background */
+    .bg-grid {
+      background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* Glassmorphism Panels */
+    .glass-panel {
+      background: rgba(10, 10, 15, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 0 1px rgba(0,0,0,1), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    /* Glitch/Tech text effect on hover */
+    .tech-link {
+      position: relative;
+      transition: all 0.2s;
+    }
+    .tech-link::before {
+      content: '>';
+      position: absolute;
+      left: -15px;
+      opacity: 0;
+      color: #d4af37;
+      transition: all 0.2s;
+    }
+    .tech-link:hover { padding-left: 5px; color: #e2e8f0; }
+    .tech-link:hover::before { opacity: 1; left: -10px; }
+
+    /* Checkbox Customization */
+    .checkbox-wrapper input:checked + div {
+      background-color: #d4af37;
+      border-color: #d4af37;
+    }
+    .checkbox-wrapper input:checked + div i {
+      opacity: 1;
+    }
+
+    /* Stack Layer Animation */
+    .stack-layer {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: perspective(1000px) rotateX(0deg) translateZ(0);
+    }
+    .stack-container:hover .stack-layer {
+      transform: perspective(1000px) rotateX(10deg) translateY(-5px);
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+    }
+    .stack-layer:hover {
+      transform: perspective(1000px) rotateX(0deg) translateZ(20px) !important;
+      background: rgba(212, 175, 55, 0.05);
+      border-color: #d4af37;
+      z-index: 10;
+    }
+    
+    /* CRT Scanline Effect Overlay */
+    .scanlines {
+      background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+      background-size: 100% 4px;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="bg-grid min-h-screen flex flex-col font-sans selection:bg-gold selection:text-void relative">
+  <div class="fixed inset-0 scanlines z-50 opacity-20 pointer-events-none"></div>
+
+  <header class="border-b border-border bg-void/90 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-2 h-2 bg-gold rounded-full animate-pulse-slow"></div>
+        <h1 class="font-serif text-lg tracking-[0.2em] text-highlight">ADEPTUS <span class="text-gold">OS</span></h1>
+        <span class="font-mono text-[10px] text-border px-2 py-0.5 border border-border rounded">V.5.0.1</span>
+      </div>
+      <div class="hidden md:flex items-center gap-6 font-mono text-xs text-text">
+        <span><i class="fa-solid fa-server mr-2 text-border"></i>SYSTEM: <span class="text-success">ONLINE</span></span>
+        <span><i class="fa-solid fa-clock mr-2 text-border"></i><span id="clock">00:00:00</span></span>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-5xl mx-auto w-full p-6 md:p-12 space-y-24">
+
+    <section class="relative pt-12">
+      <div class="absolute -left-4 top-12 h-24 w-1 bg-gold"></div>
+      <h2 class="font-mono text-gold text-xs tracking-widest mb-4">INITIATORY PROTOCOL</h2>
+      <h1 class="font-serif text-5xl md:text-6xl text-highlight mb-6 leading-tight">
+        Operational Tarot.<br>
+        <span class="text-text opacity-50">Structural Consciousness.</span>
+      </h1>
+      <p class="max-w-2xl text-lg text-text leading-relaxed font-light">
+        You have entered the <strong>Adeptus</strong> environment. Here, we discard the superstition of "fortune telling" to adopt the discipline of <strong>Symbolic Engineering</strong>. 
+        <br><br>
+        We do not ask what the future holds. We analyze the architecture of the present to calculate the trajectory of the Will.
+      </p>
+    </section>
+
+    <section>
+      <div class="flex flex-col md:flex-row gap-12 items-center">
+        <div class="w-full md:w-1/2 space-y-6">
+          <h3 class="font-serif text-2xl text-highlight"><i class="fa-solid fa-layer-group text-gold mr-3"></i>The Analytic Hierarchy</h3>
+          <p class="text-sm text-text">
+            Standard reading flattens meaning. Adeptus reading preserves verticality. Every card exists simultaneously on four frequencies. Hover to inspect the layers.
+          </p>
+          
+          <div id="stack-readout" class="glass-panel p-6 min-h-[140px] rounded-sm relative overflow-hidden">
+            <div class="font-mono text-[10px] text-gold mb-2 uppercase tracking-widest">ACTIVE LAYER DATA</div>
+            <p id="stack-desc" class="font-sans text-highlight transition-all duration-300">
+              Hover over the stack to analyze component layers.
+            </p>
+            <div class="absolute bottom-0 right-0 p-4 opacity-10">
+              <i class="fa-solid fa-microchip text-4xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full md:w-1/2 stack-container perspective-1000 py-10">
+          <div class="stack-layer glass-panel p-4 mb-2 rounded border-l-2 border-l-orange-600 cursor-pointer group" onmouseenter="describe(4)">
+            <div class="flex justify-between items-center">
+              <span class="font-serif text-highlight">4. The Event (Assiah)</span>
+              <span class="font-mono text-[10px] text-orange-600">MATERIAL</span>
+            </div>
+          </div>
+          <div class="stack-layer glass-panel p-4 mb-2 rounded border-l-2 border-l-purple-500 cursor-pointer group" onmouseenter="describe(3)">
+            <div class="flex justify-between items-center">
+              <span class="font-serif text-highlight">3. The Pattern (Yetzirah)</span>
+              <span class="font-mono text-[10px] text-purple-500">ASTRAL/FORM</span>
+            </div>
+          </div>
+          <div class="stack-layer glass-panel p-4 mb-2 rounded border-l-2 border-l-blue-500 cursor-pointer group" onmouseenter="describe(2)">
+            <div class="flex justify-between items-center">
+              <span class="font-serif text-highlight">2. The Logic (Briah)</span>
+              <span class="font-mono text-[10px] text-blue-500">CREATIVE/MIND</span>
+            </div>
+          </div>
+          <div class="stack-layer glass-panel p-4 mb-2 rounded border-l-2 border-l-white cursor-pointer group" onmouseenter="describe(1)">
+            <div class="flex justify-between items-center">
+              <span class="font-serif text-highlight">1. The Will (Atziluth)</span>
+              <span class="font-mono text-[10px] text-white">ARCHETYPAL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="max-w-3xl mx-auto w-full">
+      <div class="glass-panel p-1 rounded-sm border-t border-gold/50">
+        <div class="bg-void p-8 rounded-sm">
+          <div class="flex items-center justify-between mb-8">
+            <h3 class="font-serif text-2xl text-highlight">User Agreement // Oath</h3>
+            <i class="fa-solid fa-fingerprint text-gold text-2xl"></i>
+          </div>
+          
+          <div class="space-y-4 mb-8">
+            <label class="flex items-start gap-4 cursor-pointer checkbox-wrapper group">
+              <input type="checkbox" class="hidden oath-check">
+              <div class="w-5 h-5 border border-border rounded flex items-center justify-center transition-colors shrink-0 mt-1">
+                <i class="fa-solid fa-check text-void text-xs opacity-0 transition-opacity"></i>
+              </div>
+              <div>
+                <span class="font-sans text-highlight group-hover:text-gold transition-colors">I reject the seeking of reassurance.</span>
+                <p class="text-xs text-text mt-1">The deck is an analytical instrument, not a pacifier. I will accept cold data.</p>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-4 cursor-pointer checkbox-wrapper group">
+              <input type="checkbox" class="hidden oath-check">
+              <div class="w-5 h-5 border border-border rounded flex items-center justify-center transition-colors shrink-0 mt-1">
+                <i class="fa-solid fa-check text-void text-xs opacity-0 transition-opacity"></i>
+              </div>
+              <div>
+                <span class="font-sans text-highlight group-hover:text-gold transition-colors">I bind myself to the structure.</span>
+                <p class="text-xs text-text mt-1">I will not "feel" the meaning. I will calculate it based on Dignity, Number, and Tree.</p>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-4 cursor-pointer checkbox-wrapper group">
+              <input type="checkbox" class="hidden oath-check">
+              <div class="w-5 h-5 border border-border rounded flex items-center justify-center transition-colors shrink-0 mt-1">
+                <i class="fa-solid fa-check text-void text-xs opacity-0 transition-opacity"></i>
+              </div>
+              <div>
+                <span class="font-sans text-highlight group-hover:text-gold transition-colors">I accept the silence of Saturn.</span>
+                <p class="text-xs text-text mt-1">If the operation is blocked, I will cease. I will not force the Oracle.</p>
+              </div>
+            </label>
+          </div>
+
+          <button id="unlock-btn" disabled class="w-full py-4 border border-border text-text font-mono text-xs uppercase tracking-widest hover:bg-gold/10 hover:border-gold hover:text-gold transition-all disabled:opacity-30 disabled:cursor-not-allowed group relative overflow-hidden">
+            <span class="relative z-10 group-disabled:hidden">Initialize System Access</span>
+            <span class="relative z-10 hidden group-disabled:inline"><i class="fa-solid fa-lock mr-2"></i>Awaiting Signature</span>
+            <div class="absolute inset-0 bg-gold/5 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500 ease-in-out"></div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="modules-grid" class="opacity-30 pointer-events-none transition-all duration-1000 grayscale filter blur-[2px]">
+      <div class="flex items-center gap-4 mb-8">
+        <h3 class="font-serif text-2xl text-highlight">Curriculum Index</h3>
+        <div class="h-px flex-grow bg-border"></div>
+        <span class="font-mono text-xs text-gold">LOCKED</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <a href="adaptus-lesson-1.html" class="glass-panel p-6 rounded hover:border-gold/30 transition-all group tech-link block">
+          <div class="font-mono text-[10px] text-text mb-2">MODULE 01</div>
+          <h4 class="font-serif text-lg text-highlight mb-1 group-hover:text-gold">Elemental Dignities</h4>
+          <p class="text-xs text-text">The boolean logic of Tarot. Interaction rules.</p>
+        </a>
+        <a href="adaptus-lesson-2.html" class="glass-panel p-6 rounded hover:border-gold/30 transition-all group tech-link block">
+          <div class="font-mono text-[10px] text-text mb-2">MODULE 02</div>
+          <h4 class="font-serif text-lg text-highlight mb-1 group-hover:text-gold">Opening of the Key</h4>
+          <p class="text-xs text-text">The fractal deployment algorithm.</p>
+        </a>
+        <a href="adaptus-lesson-3.html" class="glass-panel p-6 rounded hover:border-gold/30 transition-all group tech-link block">
+          <div class="font-mono text-[10px] text-text mb-2">MODULE 03</div>
+          <h4 class="font-serif text-lg text-highlight mb-1 group-hover:text-gold">Counting the Cards</h4>
+          <p class="text-xs text-text">Narrative threading via numerical values.</p>
+        </a>
+        <a href="adaptus-lesson-4.html" class="glass-panel p-6 rounded hover:border-gold/30 transition-all group tech-link block">
+          <div class="font-mono text-[10px] text-text mb-2">MODULE 04</div>
+          <h4 class="font-serif text-lg text-highlight mb-1 group-hover:text-gold">Pairs & Triplicities</h4>
+          <p class="text-xs text-text">Syntax and sentence structure.</p>
+        </a>
+        <a href="adaptus-lesson-5.html" class="glass-panel p-6 rounded hover:border-gold/30 transition-all group tech-link block">
+          <div class="font-mono text-[10px] text-text mb-2">MODULE 05</div>
+          <h4 class="font-serif text-lg text-highlight mb-1 group-hover:text-gold">The Shadow Card</h4>
+          <p class="text-xs text-text">Subconscious drivers and root causes.</p>
+        </a>
+        <a href="adaptus-lesson-6.html" class="glass-panel p-6 rounded hover:border-gold/30 transition-all group tech-link block">
+          <div class="font-mono text-[10px] text-text mb-2">MODULE 06</div>
+          <h4 class="font-serif text-lg text-highlight mb-1 group-hover:text-gold">Spiritual vs Material</h4>
+          <p class="text-xs text-text">Determining the Qabalistic altitude.</p>
+        </a>
+        <a href="adaptus-lesson-7.html" class="glass-panel p-6 rounded hover:border-gold/30 transition-all group tech-link block">
+          <div class="font-mono text-[10px] text-text mb-2">MODULE 07</div>
+          <h4 class="font-serif text-lg text-highlight mb-1 group-hover:text-gold">The Significator</h4>
+          <p class="text-xs text-text">Targeting the querent in the chaos.</p>
+        </a>
+        <a href="adaptus-lesson-8.html" class="glass-panel p-6 rounded hover:border-gold/30 transition-all group tech-link block">
+          <div class="font-mono text-[10px] text-text mb-2">MODULE 08</div>
+          <h4 class="font-serif text-lg text-highlight mb-1 group-hover:text-gold">Saturnian Blockage</h4>
+          <p class="text-xs text-text">Handling silence and obstruction.</p>
+        </a>
+        <a href="adaptus-lesson-9.html" class="glass-panel p-6 rounded hover:border-gold/30 transition-all group tech-link block">
+          <div class="font-mono text-[10px] text-text mb-2">MODULE 09</div>
+          <h4 class="font-serif text-lg text-highlight mb-1 group-hover:text-gold">Tree-Based Resolution</h4>
+          <p class="text-xs text-text">Solving contradictions via Sephiroth.</p>
+        </a>
+        <a href="adaptus-lesson-10-gate.html" class="glass-panel p-6 rounded hover:border-gold/30 transition-all group tech-link block border border-gold/20 bg-gold/5">
+          <div class="font-mono text-[10px] text-gold mb-2">FINAL GATE</div>
+          <h4 class="font-serif text-lg text-gold mb-1">Grand Tableau</h4>
+          <p class="text-xs text-text">The total system integration test.</p>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-border mt-24 py-12 text-center">
+    <div class="font-mono text-[10px] text-text opacity-50">
+      ESOTAROT: ADEPTUS // ARCHITECT: ALPHA-2.0<br>
+      AUSTIN, TX [30.2672° N, 97.7431° W]<br>
+      <span class="text-gold">DO NOT DISCUSS INTERNAL PROTOCOLS.</span>
+    </div>
+  </footer>
+
+  <script>
+    // CLOCK
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('clock').innerText = now.toLocaleTimeString('en-US', { hour12: false });
+    }, 1000);
+
+    // STACK DESCRIPTION
+    const descriptions = {
+      1: "<strong class='text-white'>ATZILUTH (Archetypal):</strong> The pure Will or Seed. No form yet, only force. The 'Flash' of intent.",
+      2: "<strong class='text-blue-400'>BRIAH (Creative):</strong> The Mental Architecture. Plans, schematics, and deep psychology. The specific 'Idea'.",
+      3: "<strong class='text-purple-400'>YETZIRAH (Formative):</strong> The Astral Blueprint. Emotional currents, conflicts, and moods. The 'Feeling' or tension.",
+      4: "<strong class='text-orange-500'>ASSIAH (Material):</strong> The Physical Result. Objects, coins, bodies, and actual events. The 'Thing' itself."
+    };
+
+    function describe(layer) {
+      document.getElementById('stack-desc').innerHTML = descriptions[layer];
+    }
+
+    // OATH UNLOCK
+    const checks = document.querySelectorAll('.oath-check');
+    const unlockBtn = document.getElementById('unlock-btn');
+    const modulesGrid = document.getElementById('modules-grid');
+
+    checks.forEach(check => {
+      check.addEventListener('change', () => {
+        const allChecked = Array.from(checks).every(c => c.checked);
+        unlockBtn.disabled = !allChecked;
+      });
+    });
+
+    unlockBtn.addEventListener('click', () => {
+      unlockBtn.innerHTML = '<span class="text-success"><i class="fa-solid fa-check mr-2"></i>ACCESS GRANTED</span>';
+      unlockBtn.classList.remove('border-border', 'text-text');
+      unlockBtn.classList.add('border-success', 'text-success', 'bg-success/10');
+      
+      modulesGrid.classList.remove('opacity-30', 'pointer-events-none', 'grayscale', 'blur-[2px]');
+      
+      // Scroll to modules
+      setTimeout(() => {
+        modulesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 500);
+    });
+  </script>
+<!--\ FIXES-INJECTED\ -->\n<script>\ndocument\.addEventListener\("DOMContentLoaded",\ \(\)\ =>\ \{\n\ \ //\ safe\ clock\ updater\n\ \ const\ clockEl\ =\ document\.getElementById\('clock'\);\n\ \ if\ \(clockEl\)\ \{\n\ \ \ \ setInterval\(\(\)\ =>\ \{\n\ \ \ \ \ \ clockEl\.innerText\ =\ \(new\ Date\(\)\)\.toLocaleTimeString\('en-US',\ \{\ hour12:\ false\ }\);\n\ \ \ \ },\ 1000\);\n\ \ }\n\n\ \ //\ safe\ describe\ function\n\ \ const\ stackDesc\ =\ document\.getElementById\('stack-desc'\);\n\ \ const\ descriptions\ =\ \{\n\ \ \ \ 1:\ "<strong\ class='text-white'>ATZILUTH\ \(Archetypal\):</strong>\ The\ pure\ Will\ or\ Seed\.",\n\ \ \ \ 2:\ "<strong\ class='text-blue-400'>BRIAH\ \(Creative\):</strong>\ The\ Mental\ Architecture\.",\n\ \ \ \ 3:\ "<strong\ class='text-purple-400'>YETZIRAH\ \(Formative\):</strong>\ The\ Astral\ Blueprint\.",\n\ \ \ \ 4:\ "<strong\ class='text-orange-500'>ASSIAH\ \(Material\):</strong>\ The\ Physical\ Result\."\n\ \ };\n\ \ window\.describe\ =\ function\(layer\)\ \{\n\ \ \ \ if\ \(!stackDesc\)\ return;\n\ \ \ \ stackDesc\.innerHTML\ =\ descriptions\[layer]\ \|\|\ '';\n\ \ };\n\n\ \ //\ make\ stack-layer\ keyboard\ interactive\ if\ present\n\ \ document\.querySelectorAll\('\.stack-layer'\)\.forEach\(el\ =>\ \{\n\ \ \ \ if\ \(!el\.hasAttribute\('tabindex'\)\)\ el\.setAttribute\('tabindex','0'\);\n\ \ \ \ if\ \(!el\.hasAttribute\('role'\)\)\ el\.setAttribute\('role','button'\);\n\ \ \ \ //\ support\ keyboard\ activation\ to\ mirror\ onmouseenter\ behavior\n\ \ \ \ el\.addEventListener\('keydown',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ if\ \(e\.key\ ===\ 'Enter'\ \|\|\ e\.key\ ===\ '\ '\)\ \{\n\ \ \ \ \ \ \ \ e\.preventDefault\(\);\n\ \ \ \ \ \ \ \ //\ if\ element\ has\ onmouseenter\ attribute,\ try\ to\ extract\ layer\ number\ from\ innerText\n\ \ \ \ \ \ \ \ const\ m\ =\ el\.getAttribute\('onmouseenter'\)\ \|\|\ '';\n\ \ \ \ \ \ \ \ const\ match\ =\ m\.match\(/describe\\\(\(\\d\+\)\\\)/\);\n\ \ \ \ \ \ \ \ if\ \(match\)\ window\.describe\(Number\(match\[1]\)\);\n\ \ \ \ \ \ }\n\ \ \ \ }\);\n\ \ }\);\n\n\ \ //\ Oath\ checks\ \+\ unlock\ flow\ \(safe\ if\ absent\)\n\ \ const\ checks\ =\ Array\.from\(document\.querySelectorAll\('\.oath-check'\)\);\n\ \ const\ unlockBtn\ =\ document\.getElementById\('unlock-btn'\);\n\ \ const\ modulesGrid\ =\ document\.getElementById\('modules-grid'\);\n\ \ const\ header\ =\ document\.querySelector\('header'\);\n\n\ \ if\ \(checks\.length\ &&\ unlockBtn\ &&\ modulesGrid\)\ \{\n\ \ \ \ function\ updateState\(\)\ \{\n\ \ \ \ \ \ const\ allChecked\ =\ checks\.every\(c\ =>\ c\.checked\);\n\ \ \ \ \ \ unlockBtn\.disabled\ =\ !allChecked;\n\ \ \ \ \ \ unlockBtn\.setAttribute\('aria-disabled',\ String\(!allChecked\)\);\n\ \ \ \ }\n\n\ \ \ \ checks\.forEach\(check\ =>\ \{\n\ \ \ \ \ \ //\ visual\ sync\ for\ custom\ checkbox\n\ \ \ \ \ \ check\.addEventListener\('change',\ \(\)\ =>\ \{\n\ \ \ \ \ \ \ \ const\ box\ =\ check\.nextElementSibling;\n\ \ \ \ \ \ \ \ if\ \(box\)\ \{\n\ \ \ \ \ \ \ \ \ \ const\ icon\ =\ box\.querySelector\('i'\);\n\ \ \ \ \ \ \ \ \ \ if\ \(icon\)\ icon\.style\.opacity\ =\ check\.checked\ \?\ '1'\ :\ '0';\n\ \ \ \ \ \ \ \ }\n\ \ \ \ \ \ \ \ updateState\(\);\n\ \ \ \ \ \ }\);\n\n\ \ \ \ \ \ const\ label\ =\ check\.closest\('label'\);\n\ \ \ \ \ \ if\ \(label\)\ \{\n\ \ \ \ \ \ \ \ label\.addEventListener\('keydown',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ \ \ \ \ if\ \(e\.key\ ===\ '\ '\ \|\|\ e\.key\ ===\ 'Enter'\)\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ e\.preventDefault\(\);\n\ \ \ \ \ \ \ \ \ \ \ \ check\.checked\ =\ !check\.checked;\n\ \ \ \ \ \ \ \ \ \ \ \ check\.dispatchEvent\(new\ Event\('change',\ \{\ bubbles:\ true\ }\)\);\n\ \ \ \ \ \ \ \ \ \ }\n\ \ \ \ \ \ \ \ }\);\n\ \ \ \ \ \ \ \ label\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ \ \ \ \ if\ \(e\.target\ ===\ check\)\ return;\n\ \ \ \ \ \ \ \ \ \ check\.checked\ =\ !check\.checked;\n\ \ \ \ \ \ \ \ \ \ check\.dispatchEvent\(new\ Event\('change',\ \{\ bubbles:\ true\ }\)\);\n\ \ \ \ \ \ \ \ }\);\n\ \ \ \ \ \ }\n\ \ \ \ }\);\n\n\ \ \ \ unlockBtn\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ if\ \(unlockBtn\.disabled\)\ return;\n\ \ \ \ \ \ unlockBtn\.disabled\ =\ true;\n\ \ \ \ \ \ unlockBtn\.setAttribute\('aria-expanded',\ 'true'\);\n\ \ \ \ \ \ unlockBtn\.classList\.remove\('border-border',\ 'text-text'\);\n\ \ \ \ \ \ unlockBtn\.classList\.add\('border-success',\ 'text-success',\ 'bg-success/10'\);\n\ \ \ \ \ \ unlockBtn\.innerHTML\ =\ '<span\ class="relative\ z-10"><i\ class="fa-solid\ fa-check\ mr-2"></i>ACCESS\ GRANTED</span><div\ class="absolute\ inset-0\ bg-gold/5\ transform\ -translate-x-full\ group-hover:translate-x-0\ transition-transform\ duration-500\ ease-in-out"\ aria-hidden="true"></div>';\n\n\ \ \ \ \ \ //\ reveal\ modules\ safely\n\ \ \ \ \ \ modulesGrid\.classList\.remove\('opacity-30','pointer-events-none','grayscale','blur-\[2px]'\);\n\ \ \ \ \ \ modulesGrid\.setAttribute\('aria-hidden','false'\);\n\n\ \ \ \ \ \ //\ scroll\ to\ modules\ accounting\ for\ sticky\ header\n\ \ \ \ \ \ const\ headerHeight\ =\ header\ \?\ header\.offsetHeight\ :\ 0;\n\ \ \ \ \ \ const\ rectTop\ =\ modulesGrid\.getBoundingClientRect\(\)\.top\ \+\ window\.scrollY;\n\ \ \ \ \ \ const\ target\ =\ Math\.max\(0,\ rectTop\ -\ headerHeight\ -\ 12\);\n\ \ \ \ \ \ window\.scrollTo\(\{\ top:\ target,\ behavior:\ 'smooth'\ }\);\n\n\ \ \ \ \ \ //\ enable\ focus\ on\ links\ and\ focus\ first\ link\n\ \ \ \ \ \ setTimeout\(\(\)\ =>\ \{\n\ \ \ \ \ \ \ \ const\ links\ =\ modulesGrid\.querySelectorAll\('a\[href]'\);\n\ \ \ \ \ \ \ \ links\.forEach\(link\ =>\ link\.setAttribute\('tabindex','0'\)\);\n\ \ \ \ \ \ \ \ const\ first\ =\ modulesGrid\.querySelector\('a\[href]'\);\n\ \ \ \ \ \ \ \ if\ \(first\)\ first\.focus\(\);\n\ \ \ \ \ \ },\ 450\);\n\ \ \ \ }\);\n\n\ \ \ \ //\ ensure\ initial\ state\n\ \ \ \ updateState\(\);\n\ \ }\n\n\ \ //\ ensure\ module\ links\ are\ clickable\ even\ if\ some\ parent\ had\ pointer-events\ disabled\n\ \ document\.querySelectorAll\('\#modules-grid\ a\[href]'\)\.forEach\(a\ =>\ \{\n\ \ \ \ a\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ //\ ensure\ normal\ navigation\ on\ click\n\ \ \ \ \ \ if\ \(a\.getAttribute\('href'\)\)\ return;\n\ \ \ \ }\);\n\ \ \ \ //\ ensure\ correct\ relative\ href\ prefix\ \(best-effort\)\n\ \ \ \ const\ href\ =\ a\.getAttribute\('href'\)\ \|\|\ '';\n\ \ \ \ if\ \(href\ &&\ !href\.startsWith\('\./'\)\ &&\ !href\.startsWith\('http'\)\ &&\ !href\.startsWith\('/'\)\)\ \{\n\ \ \ \ \ \ a\.setAttribute\('href',\ '\./'\ \+\ href\);\n\ \ \ \ }\n\ \ }\);\n}\);\n</script><!--\ FIXES-INJECTED\ -->\n<script>\ndocument\.addEventListener\('DOMContentLoaded',\ \(\)\ =>\ \{\n\ \ try\ \{\n\ \ \ \ if\ \(!document\.getElementById\('console-output'\)\)\ \{\n\ \ \ \ \ \ const\ d\ =\ document\.createElement\('div'\);\ d\.id\ =\ 'console-output';\ d\.style\.display\ =\ 'none';\ document\.body\.appendChild\(d\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('unlock-btn'\)\)\ \{\n\ \ \ \ \ \ const\ b\ =\ document\.createElement\('button'\);\ b\.id\ =\ 'unlock-btn';\ b\.style\.display\ =\ 'none';\ document\.body\.appendChild\(b\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('modules-grid'\)\)\ \{\n\ \ \ \ \ \ const\ m\ =\ document\.createElement\('div'\);\ m\.id\ =\ 'modules-grid';\ m\.style\.display\ =\ 'none';\ document\.body\.appendChild\(m\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('stage-4'\)\)\ \{\n\ \ \ \ \ \ const\ s\ =\ document\.createElement\('section'\);\ s\.id\ =\ 'stage-4';\ s\.style\.display\ =\ 'none';\ document\.body\.appendChild\(s\);\n\ \ \ \ }\n\ \ \ \ if\ \(!document\.getElementById\('option-c'\)\)\ \{\n\ \ \ \ \ \ const\ oc\ =\ document\.createElement\('button'\);\ oc\.id\ =\ 'option-c';\ oc\.style\.display\ =\ 'none';\ document\.body\.appendChild\(oc\);\n\ \ \ \ }\n\n\ \ \ \ document\.addEventListener\('click',\ \(e\)\ =>\ \{\n\ \ \ \ \ \ const\ opt\ =\ e\.target\.closest\('\.option-btn'\);\n\ \ \ \ \ \ if\ \(opt\)\ \{\n\ \ \ \ \ \ \ \ const\ reason\ =\ opt\.dataset\.failure\ \|\|\ 'Incorrect\ choice\.';\n\ \ \ \ \ \ \ \ if\ \(typeof\ window\.failLog\ ===\ 'function'\)\ window\.failLog\(reason\);\n\ \ \ \ \ \ \ \ else\ console\.error\(reason\);\n\ \ \ \ \ \ }\n\ \ \ \ \ \ const\ oc\ =\ e\.target\.closest\('\#option-c'\);\n\ \ \ \ \ \ if\ \(oc\)\ \{\n\ \ \ \ \ \ \ \ if\ \(typeof\ window\.finishExam\ ===\ 'function'\)\ window\.finishExam\(\);\n\ \ \ \ \ \ }\n\ \ \ \ },\ true\);\n\ \ }\ catch\ \(err\)\ \{\n\ \ \ \ console\.error\('FIXES-INJECTED\ error',\ err\);\n\ \ }\n}\);\n</script></body>
+</html>
+

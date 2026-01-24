@@ -1,0 +1,396 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SYSTEM: ZELATOR // MODULE 01</title>
+
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Inter:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;700&family=Noto+Sans+Hebrew:wght@400;700&display=swap" rel="stylesheet">
+
+  <script type="text/javascript">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            void: '#030005',
+            obsidian: '#0a0a0f',
+            silver: '#94a3b8',
+            electric: '#a78bfa',
+            violet: '#4c1d95',
+            alert: '#ef4444',
+            success: '#10b981',
+
+            // Sephira Colors (Muted/Technical)
+            kether: '#f8fafc',
+            chokmah: '#94a3b8',
+            binah: '#1e293b',
+            chesed: '#3b82f6',
+            geburah: '#ef4444',
+            tiphareth: '#eab308',
+            netzach: '#22c55e',
+            hod: '#f97316',
+            yesod: '#a78bfa',
+            malkuth: '#78350f',
+          },
+          fontFamily: {
+            serif: ['"Cinzel"', 'serif'],
+            body: ['"Cormorant Garamond"', 'serif'],
+            sans: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            hebrew: ['"Noto Sans Hebrew"', 'serif'],
+          },
+          backgroundImage: {
+            grid:
+              "url('data:image/svg+xml,%3Csvg width=%2740%27 height=%2740%27 viewBox=%270 0 40 40%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath d=%27M0 0h40v40H0V0zm1 1h38v38H1V1z%27 fill=%27%23a78bfa%27 fill-opacity=%270.02%27 fill-rule=%27evenodd%27/%3E%3C/svg%3E')",
+          },
+          animation: {
+            'spin-slow': 'spin 12s linear infinite',
+            'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root { color-scheme: dark; }
+    html, body { height: 100%; }
+    body { background-color:#030005; color:#e2e8f0; }
+
+    /* ✅ Scroll fix: one stable scroll container (main), body not overflow-locked */
+    .app-shell {
+      min-height: 100dvh;
+      display: flex;
+      background-color:#030005;
+      background-image: var(--tw-bg-grid);
+    }
+
+    /* smoother wheel + iOS momentum inside the scroll container */
+    .scroll-pane {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      min-width: 0;
+    }
+
+    /* (optional) custom scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { width: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.25); border: 2px solid rgba(0,0,0,0.6); }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(167,139,250,0.35); }
+
+    .tech-border {
+      position: relative;
+      background: rgba(10,10,15,0.6);
+      border: 1px solid rgba(167,139,250,0.15);
+    }
+    .tech-border::before, .tech-border::after {
+      content:'';
+      position:absolute;
+      width:4px; height:4px;
+      background:#a78bfa;
+      opacity:0.5;
+    }
+    .tech-border::before { top:-1px; left:-1px; }
+    .tech-border::after { bottom:-1px; right:-1px; }
+
+    /* Node Styles */
+    .node-container { cursor:pointer; transition: all .25s ease; }
+    .node-ring { fill:none; stroke:#334155; stroke-width:1; transition: all .25s ease; }
+    .node-core { fill:#0f172a; stroke:#334155; stroke-width:2; transition: all .25s ease; }
+    .node-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      fill: #64748b;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      pointer-events: none;
+    }
+
+    .node-container:hover .node-core,
+    .node-container.active .node-core {
+      fill:#1e293b;
+      stroke:#a78bfa;
+      filter: drop-shadow(0 0 8px rgba(167,139,250,0.5));
+    }
+    .node-container:hover .node-label,
+    .node-container.active .node-label { fill:#fff; font-weight:700; }
+    .node-container.active .node-ring {
+      stroke:#a78bfa;
+      stroke-dasharray:4 2;
+      animation: spin 10s linear infinite;
+    }
+
+    .path-line { stroke:#1e293b; stroke-width:1; }
+
+    .cursor::after {
+      content:'█';
+      animation: blink 1s step-end infinite;
+      color:#a78bfa;
+      margin-left:2px;
+    }
+    @keyframes blink { 50% { opacity:0; } }
+  </style>
+</head>
+
+<body class="font-sans selection:bg-electric selection:text-black">
+  <div class="app-shell bg-grid">
+
+    <!-- SIDEBAR -->
+    <aside class="w-72 border-r border-white/5 hidden md:flex flex-col bg-void/90 backdrop-blur-md sticky top-0 h-dvh z-20">
+      <div class="p-6 border-b border-white/5">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 border border-electric/30 flex items-center justify-center bg-electric/5">
+            <i class="fa-solid fa-cube text-electric text-xs"></i>
+          </div>
+          <div>
+            <div class="font-mono text-[10px] text-electric tracking-[0.2em]">ESOTAROT</div>
+            <div class="font-mono text-[10px] text-gray-500">MODULE 01 // LOADED</div>
+          </div>
+        </div>
+
+        <a href="zelator-intro.html" class="group flex items-center gap-2 px-2 py-1 mb-2 text-[10px] font-mono text-gray-500 hover:text-white transition-colors">
+          <i class="fa-solid fa-arrow-left text-[8px] group-hover:-translate-x-1 transition-transform"></i>
+          RETURN TO DASHBOARD
+        </a>
+      </div>
+
+      <nav class="flex-1 overflow-y-auto custom-scrollbar py-6 px-4 space-y-1">
+        <div class="px-2 mb-4 font-mono text-[9px] text-gray-600 uppercase tracking-widest border-b border-white/5 pb-2">Sequence</div>
+
+        <a href="#" class="block px-3 py-2 text-xs font-mono text-white bg-white/5 border-l-2 border-electric transition-all">
+          01 The Ten Sephiroth
+        </a>
+        <a href="zelator-lesson-2.html" class="block px-3 py-2 text-xs font-mono text-gray-500 hover:text-white hover:bg-white/5 border-l-2 border-transparent transition-all">
+          02 The Lightning Flash
+        </a>
+        <a href="zelator-lesson-3.html" class="block px-3 py-2 text-xs font-mono text-gray-500 hover:text-white hover:bg-white/5 border-l-2 border-transparent transition-all">
+          03 Involution Dynamics
+        </a>
+        <a href="zelator-lesson-4.html" class="block px-3 py-2 text-xs font-mono text-gray-500 hover:text-white hover:bg-white/5 border-l-2 border-transparent transition-all">
+          04 The Four Aces
+        </a>
+      </nav>
+
+      <div class="p-6 border-t border-white/5">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-indigo-900/20 border border-indigo-500/30 flex items-center justify-center text-electric font-serif text-xs">Z</div>
+          <div>
+            <div class="text-[10px] font-mono text-gray-400">INITIATE</div>
+            <div class="text-[9px] font-mono text-gray-600">PROGRESS: 14%</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN SCROLL CONTAINER (✅ FIXED) -->
+    <main class="scroll-pane custom-scrollbar flex-1 relative z-10">
+
+      <header class="max-w-7xl mx-auto px-6 md:px-8 py-12 md:py-16">
+        <div class="flex items-center gap-4 mb-6">
+          <span class="h-px w-8 bg-electric"></span>
+          <span class="font-mono text-[10px] tracking-[0.3em] text-electric uppercase">Module 01</span>
+        </div>
+
+        <h1 class="font-serif text-4xl md:text-5xl text-white mb-6 leading-tight">
+          The Ten Sephiroth<br>
+          <span class="text-gray-500 text-3xl">Architecture of Emanation</span>
+        </h1>
+
+        <article class="max-w-3xl border-l border-electric/30 pl-6 mb-12 md:mb-16">
+          <p class="font-body text-xl text-gray-300 leading-relaxed mb-4">
+            The Qabalah does not teach that the universe was "built." It teaches that it was
+            <span class="text-white italic">emanated</span>.
+            Like a signal stepping down through a series of transformers, reality moves from high-frequency unity (Kether)
+            to low-frequency matter (Malkuth).
+          </p>
+          <p class="font-mono text-xs text-gray-500 leading-relaxed">
+            // OPERATIONAL NOTE: The word "Sephira" (plural: Sephiroth) relates to "Cipher" (Number) and "Sapphire" (Brilliance).
+            These are the ten fundamental variables of the system. Every Tarot card is a specific mixture of these ten lights.
+            To read Tarot without the Sephiroth is to do math without numbers.
+          </p>
+        </article>
+
+        <!-- INTERACTIVE PANEL -->
+        <div class="tech-border bg-obsidian/50 p-6 md:p-8 rounded-sm mb-12 md:mb-16 shadow-2xl">
+          <div class="flex flex-col lg:flex-row gap-8 md:gap-12 items-start">
+            <div class="relative w-full lg:w-1/2 h-[520px] md:h-[600px] flex justify-center select-none bg-void/30 border border-white/5 rounded-sm">
+              <svg viewBox="0 0 300 600" class="w-full h-full p-4" id="tree-interact" role="img" aria-label="Tree of Life interactive diagram">
+                <g class="paths">
+                  <line x1="150" y1="50" x2="150" y2="550" class="path-line" />
+                  <line x1="50" y1="150" x2="50" y2="450" class="path-line" />
+                  <line x1="250" y1="150" x2="250" y2="450" class="path-line" />
+                  <line x1="150" y1="50" x2="250" y2="150" class="path-line" />
+                  <line x1="250" y1="150" x2="50" y2="150" class="path-line" />
+                  <line x1="50" y1="150" x2="150" y2="50" class="path-line" />
+                  <line x1="50" y1="150" x2="250" y2="250" class="path-line" />
+                  <line x1="250" y1="250" x2="50" y2="250" class="path-line" />
+                  <line x1="50" y1="250" x2="150" y2="350" class="path-line" />
+                  <line x1="150" y1="350" x2="50" y2="450" class="path-line" />
+                  <line x1="50" y1="450" x2="250" y2="450" class="path-line" />
+                  <line x1="250" y1="450" x2="150" y2="550" class="path-line" />
+                  <line x1="250" y1="150" x2="150" y2="350" class="path-line" />
+                  <line x1="150" y1="350" x2="250" y2="450" class="path-line" />
+                  <line x1="150" y1="350" x2="150" y2="500" class="path-line" />
+                  <line x1="150" y1="500" x2="150" y2="550" class="path-line" />
+                </g>
+
+                <!-- Nodes -->
+                <g class="node-container" data-node="1" id="node-1"><circle cx="150" cy="50" r="18" class="node-ring"/><circle cx="150" cy="50" r="12" class="node-core"/><text x="150" y="50" class="node-label">1</text></g>
+                <g class="node-container" data-node="2" id="node-2"><circle cx="250" cy="150" r="18" class="node-ring"/><circle cx="250" cy="150" r="12" class="node-core"/><text x="250" y="150" class="node-label">2</text></g>
+                <g class="node-container" data-node="3" id="node-3"><circle cx="50" cy="150" r="18" class="node-ring"/><circle cx="50" cy="150" r="12" class="node-core"/><text x="50" y="150" class="node-label">3</text></g>
+                <g class="node-container" data-node="4" id="node-4"><circle cx="250" cy="250" r="18" class="node-ring"/><circle cx="250" cy="250" r="12" class="node-core"/><text x="250" y="250" class="node-label">4</text></g>
+                <g class="node-container" data-node="5" id="node-5"><circle cx="50" cy="250" r="18" class="node-ring"/><circle cx="50" cy="250" r="12" class="node-core"/><text x="50" y="250" class="node-label">5</text></g>
+                <g class="node-container" data-node="6" id="node-6"><circle cx="150" cy="350" r="18" class="node-ring"/><circle cx="150" cy="350" r="12" class="node-core"/><text x="150" y="350" class="node-label">6</text></g>
+                <g class="node-container" data-node="7" id="node-7"><circle cx="250" cy="450" r="18" class="node-ring"/><circle cx="250" cy="450" r="12" class="node-core"/><text x="250" y="450" class="node-label">7</text></g>
+                <g class="node-container" data-node="8" id="node-8"><circle cx="50" cy="450" r="18" class="node-ring"/><circle cx="50" cy="450" r="12" class="node-core"/><text x="50" y="450" class="node-label">8</text></g>
+                <g class="node-container" data-node="9" id="node-9"><circle cx="150" cy="500" r="18" class="node-ring"/><circle cx="150" cy="500" r="12" class="node-core"/><text x="150" y="500" class="node-label">9</text></g>
+                <g class="node-container" data-node="10" id="node-10"><circle cx="150" cy="550" r="18" class="node-ring"/><circle cx="150" cy="550" r="12" class="node-core"/><text x="150" y="550" class="node-label">10</text></g>
+              </svg>
+            </div>
+
+            <div class="w-full lg:w-1/2 min-h-[520px] md:min-h-[500px] border border-white/10 bg-black/40 p-6 flex flex-col relative overflow-hidden">
+              <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-2">
+                <span class="font-mono text-[10px] text-electric uppercase tracking-widest">Node Inspector</span>
+                <div class="flex gap-1">
+                  <div class="w-1 h-1 bg-gray-600 rounded-full"></div>
+                  <div class="w-1 h-1 bg-gray-600 rounded-full"></div>
+                  <div class="w-1 h-1 bg-gray-600 rounded-full"></div>
+                </div>
+              </div>
+
+              <div id="inspector-content" class="flex-1 flex flex-col justify-center items-center text-center">
+                <i class="fa-solid fa-crosshairs text-4xl text-white/10 mb-4 animate-pulse"></i>
+                <div class="font-mono text-xs text-gray-500">AWAITING TARGET SELECTION</div>
+                <div class="font-mono text-[9px] text-gray-700 mt-2">CLICK A NODE ON THE GRID</div>
+              </div>
+
+              <div class="mt-auto pt-4 border-t border-white/5 flex justify-between font-mono text-[9px] text-gray-700">
+                <span>DATA STREAM: IDLE</span>
+                <span id="freq">FREQ: 0.00Hz</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 md:mb-20">
+          <div class="bg-white/5 border border-white/10 p-6">
+            <div class="font-mono text-[10px] text-gray-500 uppercase tracking-widest mb-3">Subsystem 01</div>
+            <h3 class="font-serif text-xl text-white mb-3">The Supernal Triad</h3>
+            <p class="font-body text-sm text-gray-400 leading-relaxed">
+              Nodes 1, 2, and 3 (Kether, Chokmah, Binah). These exist above the "Abyss."
+              They represent principles that are too abstract for the human mind to fully grasp.
+              <br><br>
+              <span class="text-electric font-mono text-[10px]">IN TAROT:</span> The Aces, Twos, and Threes.
+            </p>
+          </div>
+          <div class="bg-white/5 border border-white/10 p-6">
+            <div class="font-mono text-[10px] text-gray-500 uppercase tracking-widest mb-3">Subsystem 02</div>
+            <h3 class="font-serif text-xl text-white mb-3">The Ethical Triangle</h3>
+            <p class="font-body text-sm text-gray-400 leading-relaxed">
+              Nodes 4, 5, and 6 (Chesed, Geburah, Tiphareth). The moral machinery of the universe.
+              Expansion, Restriction, and Balance. This is where "karma" is processed.
+              <br><br>
+              <span class="text-electric font-mono text-[10px]">IN TAROT:</span> The Fours, Fives, and Sixes.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center border-t border-white/10 pt-8">
+          <a href="zelator-intro.html" class="text-gray-500 hover:text-white font-mono text-xs tracking-widest uppercase transition flex items-center gap-2">
+            <i class="fa-solid fa-arrow-left"></i> Dashboard
+          </a>
+          <a href="zelator-lesson-2.html" class="group flex items-center gap-4">
+            <div class="text-right">
+              <div class="font-mono text-[9px] text-gray-500 tracking-[0.2em] uppercase">Next Protocol</div>
+              <div class="font-serif text-white group-hover:text-electric transition">The Lightning Flash</div>
+            </div>
+            <div class="w-10 h-10 border border-white/20 flex items-center justify-center group-hover:border-electric transition bg-white/5">
+              <i class="fa-solid fa-arrow-right text-xs text-gray-400 group-hover:text-electric"></i>
+            </div>
+          </a>
+        </div>
+
+      </header>
+    </main>
+  </div>
+
+  <script type="text/javascript">
+    (function(){
+      const db = {
+        1:{name:"Kether",hebrew:"כתר",trans:"The Crown",def:"The Singularity. The point of origin. Pure potential before any division occurs.",planet:"Primum Mobile"},
+        2:{name:"Chokmah",hebrew:"חכמה",trans:"Wisdom",def:"The Great Father. Raw, explosive force. The fuel of the universe, not yet shaped.",planet:"Zodiac"},
+        3:{name:"Binah",hebrew:"בינה",trans:"Understanding",def:"The Great Mother. Form, restriction, and container. She shapes the force of Chokmah.",planet:"Saturn"},
+        4:{name:"Chesed",hebrew:"חסד",trans:"Mercy",def:"The Builder. Expansion, kindness, and structural growth. The benevolent King.",planet:"Jupiter"},
+        5:{name:"Geburah",hebrew:"גבורה",trans:"Severity",def:"The Warrior. Necessary destruction. Pruning the dead wood to prevent stagnation.",planet:"Mars"},
+        6:{name:"Tiphareth",hebrew:"תפארת",trans:"Beauty",def:"The Solar Center. The equilibrium between Force and Form. The heart of the system.",planet:"Sun"},
+        7:{name:"Netzach",hebrew:"נצח",trans:"Victory",def:"Instinct & Emotion. The raw feelings of nature, desire, and attraction.",planet:"Venus"},
+        8:{name:"Hod",hebrew:"הוד",trans:"Glory",def:"Intellect & Logic. The structuring of thought, communication, and science.",planet:"Mercury"},
+        9:{name:"Yesod",hebrew:"יסוד",trans:"Foundation",def:"The Machinery. The astral blueprint, the subconscious, and the dream interface.",planet:"Moon"},
+        10:{name:"Malkuth",hebrew:"מלכות",trans:"Kingdom",def:"The Output. Physical reality. The final density where the circuit grounds out.",planet:"Earth"}
+      };
+
+      const display = document.getElementById('inspector-content');
+      const freq = document.getElementById('freq');
+
+      function render(id){
+        const data = db[id];
+        if(!data || !display) return;
+
+        document.querySelectorAll('.node-container').forEach(n => n.classList.remove('active'));
+        const active = document.getElementById(`node-${id}`);
+        if(active) active.classList.add('active');
+
+        if(freq) freq.textContent = `FREQ: ${(0.5 + id/10).toFixed(2)}Hz`;
+
+        display.innerHTML = `
+          <div class="w-full text-left">
+            <div class="flex justify-between items-baseline border-b border-white/10 pb-4 mb-4">
+              <h2 class="font-serif text-3xl text-white">${data.name}</h2>
+              <div class="text-right">
+                <div class="font-hebrew text-xl text-gray-500">${data.hebrew}</div>
+                <div class="font-mono text-[9px] text-gray-600 uppercase tracking-widest">${data.trans}</div>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <div class="font-mono text-[9px] text-electric mb-1 cursor">OPERATIONAL DEFINITION</div>
+              <p class="font-body text-lg text-gray-300 italic leading-relaxed">
+                "${data.def}"
+              </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-white/5 p-3 rounded-sm border border-white/5">
+                <div class="font-mono text-[9px] text-gray-500 uppercase">Assignment</div>
+                <div class="font-sans text-sm text-white mt-1">${data.planet}</div>
+              </div>
+              <div class="bg-white/5 p-3 rounded-sm border border-white/5">
+                <div class="font-mono text-[9px] text-gray-500 uppercase">Tarot Link</div>
+                <div class="font-sans text-sm text-white mt-1">The ${id === 1 ? 'Aces' : id + 's'}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // ✅ no inline onclick; bind once via delegation
+      const svg = document.getElementById('tree-interact');
+      if(svg){
+        svg.addEventListener('click', (e) => {
+          const node = e.target.closest('.node-container');
+          if(!node) return;
+          const id = Number(node.getAttribute('data-node'));
+          if(!Number.isFinite(id)) return;
+          render(id);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
