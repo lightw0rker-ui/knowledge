@@ -236,7 +236,7 @@ const Header = () => (
   <div className="flex items-center justify-between border-b border-slate-700 pb-4 mb-6 bg-slate-950 p-4 rounded-t-lg sticky top-0 z-10">
     <div className="flex items-center space-x-2 text-indigo-400">
       <Terminal className="w-5 h-5" />
-      <span className="font-mono text-sm tracking-[0.2em] font-bold">ALPHA_KNOWLEDGE_BASE // ROOT_DIRECTORY</span>
+      <span className="font-mono text-sm tracking-[0.2em] font-bold">ARCHITECT OF THE INVISIBLE</span>
     </div>
     <div className="flex items-center space-x-4 text-xs font-mono text-slate-500">
       <div className="flex items-center">
@@ -318,7 +318,7 @@ const SectionRow = ({ section, moduleId }: { section: Section; moduleId: string 
   </Link>
 );
 
-export default function AlphaKnowledgeHub() {
+export default function ArchitectOfTheInvisible() {
   const [activeId, setActiveId] = useState<string>('01');
   const activeModule = knowledgeBase.find(m => m.id === activeId) || knowledgeBase[0];
 
